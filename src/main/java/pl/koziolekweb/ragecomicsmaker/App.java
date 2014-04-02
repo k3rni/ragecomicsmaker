@@ -1,5 +1,6 @@
 package pl.koziolekweb.ragecomicsmaker;
 
+import pl.koziolekweb.ragecomicsmaker.gui.FilesPanel;
 import pl.koziolekweb.ragecomicsmaker.gui.FramesPanel;
 import pl.koziolekweb.ragecomicsmaker.gui.ImagePanel;
 
@@ -17,7 +18,7 @@ public class App implements Runnable {
 	@Override
 	public void run() {
 		JFrame main = new JFrame("Rage Comics Maker");
-		main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		main.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		main.setMinimumSize(new Dimension(640, 480));
 		mainPanel(main);
 
@@ -30,35 +31,23 @@ public class App implements Runnable {
 		SpringLayout springLayout = new SpringLayout();
 		mainPanel.setLayout(springLayout);
 
-		JButton openDirBtn = new JButton("Select Directory");
-		mainPanel.add(openDirBtn);
-
-		JScrollPane fileTree = prepareFileTree(mainPanel);
-
-		JButton saveBtn = new JButton("Save comics.xml");
-		mainPanel.add(saveBtn);
-
+		FilesPanel filesPanel = new FilesPanel();
 		ImagePanel imagePanel = new ImagePanel();
 		FramesPanel framesPanel = new FramesPanel();
 
+		mainPanel.add(filesPanel);
 		mainPanel.add(imagePanel);
 		mainPanel.add(framesPanel);
 
+		springLayout.putConstraint(SpringLayout.NORTH, filesPanel, 5, SpringLayout.NORTH, mainPanel);
+		springLayout.putConstraint(SpringLayout.SOUTH, filesPanel, -5, SpringLayout.SOUTH, mainPanel);
+		springLayout.putConstraint(SpringLayout.WEST, filesPanel, 5, SpringLayout.WEST, mainPanel);
+		springLayout.putConstraint(SpringLayout.EAST, filesPanel, 250, SpringLayout.WEST, mainPanel);
 
-		springLayout.putConstraint(SpringLayout.WEST, openDirBtn, 5, SpringLayout.WEST, mainPanel);
-		springLayout.putConstraint(SpringLayout.NORTH, openDirBtn, 5, SpringLayout.NORTH, mainPanel);
-
-		springLayout.putConstraint(SpringLayout.WEST, fileTree, 5, SpringLayout.WEST, mainPanel);
-		springLayout.putConstraint(SpringLayout.NORTH, fileTree, 5, SpringLayout.SOUTH, openDirBtn);
-		springLayout.putConstraint(SpringLayout.SOUTH, fileTree, -5, SpringLayout.NORTH, saveBtn);
-		springLayout.putConstraint(SpringLayout.EAST, fileTree, -5, SpringLayout.EAST, openDirBtn);
-
-		springLayout.putConstraint(SpringLayout.WEST, saveBtn, 5, SpringLayout.WEST, mainPanel);
-		springLayout.putConstraint(SpringLayout.SOUTH, saveBtn, -5, SpringLayout.SOUTH, mainPanel);
 
 		springLayout.putConstraint(SpringLayout.NORTH, imagePanel, 5, SpringLayout.NORTH, mainPanel);
 		springLayout.putConstraint(SpringLayout.SOUTH, imagePanel, -5, SpringLayout.SOUTH, mainPanel);
-		springLayout.putConstraint(SpringLayout.WEST, imagePanel, 5, SpringLayout.EAST, openDirBtn);
+		springLayout.putConstraint(SpringLayout.WEST, imagePanel, 5, SpringLayout.EAST, filesPanel);
 		springLayout.putConstraint(SpringLayout.EAST, imagePanel, 5, SpringLayout.WEST, framesPanel);
 
 		springLayout.putConstraint(SpringLayout.NORTH, framesPanel, 5, SpringLayout.NORTH, mainPanel);
@@ -67,13 +56,5 @@ public class App implements Runnable {
 		springLayout.putConstraint(SpringLayout.WEST, framesPanel, -250, SpringLayout.EAST, mainPanel);
 		springLayout.putConstraint(SpringLayout.EAST, framesPanel, 5, SpringLayout.EAST, mainPanel);
 
-	}
-
-
-	private JScrollPane prepareFileTree(Container mainPanel) {
-		JTree fileTree = new JTree(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 8, 9, 10, 11, 12, 13, 8, 9, 10, 11, 12, 13, 8, 9, 10, 11, 12, 13, 8, 9, 10, 11, 12, 13});
-		JScrollPane jsp = new JScrollPane(fileTree);
-		mainPanel.add(jsp);
-		return jsp;
 	}
 }
