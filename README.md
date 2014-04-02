@@ -1,4 +1,4 @@
-img2acv
+Rage Comics Maker
 =======
 
-Simple program to prepare ACV xml files from images (jpg/png)
+Simple program to prepare ACV files from images (jpg/png)
