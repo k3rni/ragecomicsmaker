@@ -11,17 +11,18 @@ import java.io.Serializable;
 public class Images implements Serializable {
 
 	@XmlAttribute(required = true)
-	private int length;//="50"
+	private int length;
 	@XmlAttribute(required = true)
-	private int startAt;//="0"
+	private int startAt;
 	@XmlAttribute(required = true)
-	private String indexPattern;//="000"
+	private String indexPattern;
 	@XmlAttribute(required = true)
-	private String namePattern;//="screen@index"
+	private String namePattern;
 
 	public Images() {
 		//
 	}
+
 
 	@XmlTransient
 	public int getLength() {
@@ -57,5 +58,13 @@ public class Images implements Serializable {
 
 	public void setNamePattern(String namePattern) {
 		this.namePattern = namePattern;
+	}
+
+	public Images initDefaults() {
+		this.length = 0;
+		this.startAt = 0;
+		this.indexPattern = "";
+		this.namePattern = "";
+		return this;
 	}
 }

@@ -3,6 +3,7 @@ package pl.koziolekweb.ragecomicsmaker.model;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.File;
 import java.io.Serializable;
 import java.util.TreeSet;
 
@@ -22,8 +23,21 @@ public class Screen implements Serializable, Comparable<Screen> {
 	@XmlElement
 	private TreeSet<Frame> frames;
 
+	// a teraz drogie dzieci nie xmlowa część modelu tzw. core
+	@XmlTransient
+	private File image;
+
 	public Screen() {
 		frames = new TreeSet<Frame>();
+	}
+
+	@XmlTransient
+	public File getImage() {
+		return image;
+	}
+
+	public void setImage(File image) {
+		this.image = image;
 	}
 
 	public void addFrame(Frame frame) {

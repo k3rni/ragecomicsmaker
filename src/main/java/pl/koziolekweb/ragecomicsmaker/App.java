@@ -1,5 +1,6 @@
 package pl.koziolekweb.ragecomicsmaker;
 
+import com.google.common.eventbus.EventBus;
 import pl.koziolekweb.ragecomicsmaker.gui.FilesPanel;
 import pl.koziolekweb.ragecomicsmaker.gui.FramesPanel;
 import pl.koziolekweb.ragecomicsmaker.gui.ImagePanel;
@@ -11,6 +12,9 @@ import java.awt.*;
  * Hello world!
  */
 public class App implements Runnable {
+
+	public static final EventBus EVENT_BUS = new EventBus();
+
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new App());
 	}

@@ -43,6 +43,23 @@ public class Comic implements Serializable {
 		screens = new TreeSet<Screen>();
 	}
 
+	/**
+	 * Methods to init object with default values. Need in first sprint.
+	 *
+	 * @return
+	 */
+	public Comic initDefaults() {
+		this.version = 0;
+		this.id = "";
+		this.title = "";
+		this.direction = Direction.LTR;
+		this.orientation = "";
+		this.transition = "";
+		this.bgcolor = "#FFFFFF";
+		this.images = new Images().initDefaults();
+		return this;
+	}
+
 	public void addScreen(Screen screen) {
 		screens.add(screen);
 	}
