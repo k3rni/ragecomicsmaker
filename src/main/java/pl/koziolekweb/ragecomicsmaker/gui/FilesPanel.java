@@ -2,8 +2,11 @@ package pl.koziolekweb.ragecomicsmaker.gui;
 
 import com.google.common.eventbus.Subscribe;
 import pl.koziolekweb.ragecomicsmaker.App;
-import pl.koziolekweb.ragecomicsmaker.event.FileSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.gui.action.SelectFileAction;
+import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.swing.*;
@@ -21,10 +24,11 @@ import static javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class FilesPanel extends JPanel implements FileSelectedEventListener {
+public class FilesPanel extends JPanel implements DirSelectedEventListener {
 
 	private JTree fileTree;
 	private File curentProjectDir;
+	private Comic comic;
 
 	public FilesPanel() {
 		super();
@@ -42,8 +46,9 @@ public class FilesPanel extends JPanel implements FileSelectedEventListener {
 	}
 
 	@Subscribe
-	public void handleFileSelectedEvent(FileSelectedEvent event) {
-		Collection<Screen> images = event.getModel().getScreens();
+	public void handleDirSelectedEvent(DirSelectedEvent event) {
+		this.comic = event.getModel();
+		Collection<Screen> images = comic.getScreens();
 		DefaultTreeModel model = (DefaultTreeModel) fileTree.getModel();
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 		for (Screen image : images) {
@@ -57,16 +62,17 @@ public class FilesPanel extends JPanel implements FileSelectedEventListener {
 	private JScrollPane prepareFileTree() {
 		fileTree = new JTree(new String[]{});
 		fileTree.getSelectionModel().setSelectionMode(SINGLE_TREE_SELECTION);
-		fileTree.addTreeSelectionListener(new TreeSelectionListener() {
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				System.out.println(fileTree.getLastSelectedPathComponent());
-				System.out.println(e.getNewLeadSelectionPath().getLastPathComponent());
-//				File f =   curentProjectDir.get
-			}
-		});
+		fileTree.addTreeSelectionListener(new ImageFIleTreeSelectionListener());
 		JScrollPane jsp = new JScrollPane(fileTree);
 		add(jsp, BorderLayout.CENTER);
 		return jsp;
+	}
+
+	private class ImageFIleTreeSelectionListener implements TreeSelectionListener {
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			Screen selectedScreen = comic.findScreenByFileName(e.getNewLeadSelectionPath().getLastPathComponent().toString());
+			App.EVENT_BUS.post(new ImageSelectedEvent(comic, selectedScreen));
+		}
 	}
 }

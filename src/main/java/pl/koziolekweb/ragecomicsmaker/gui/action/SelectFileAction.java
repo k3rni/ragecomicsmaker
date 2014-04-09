@@ -1,7 +1,7 @@
 package pl.koziolekweb.ragecomicsmaker.gui.action;
 
 import pl.koziolekweb.ragecomicsmaker.App;
-import pl.koziolekweb.ragecomicsmaker.event.FileSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +29,6 @@ public class SelectFileAction extends MouseAdapter {
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.showOpenDialog(parent);
 		File selectedFile = jfc.getSelectedFile();
-		App.EVENT_BUS.post(new FileSelectedEvent(selectedFile));
+		App.EVENT_BUS.post(new DirSelectedEvent(selectedFile));
 	}
 }

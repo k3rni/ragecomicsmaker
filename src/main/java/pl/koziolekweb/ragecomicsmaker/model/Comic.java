@@ -1,5 +1,7 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import pl.koziolekweb.ragecomicsmaker.xml.DirectionAdapter;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -8,7 +10,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.TreeSet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * TODO write JAVADOC!!!
@@ -46,7 +52,7 @@ public class Comic implements Serializable {
 	/**
 	 * Methods to init object with default values. Need in first sprint.
 	 *
-	 * @return
+	 * @return Comic with default values
 	 */
 	public Comic initDefaults() {
 		this.version = 0;
@@ -143,5 +149,17 @@ public class Comic implements Serializable {
 
 	public void setBgcolor(String bgcolor) {
 		this.bgcolor = bgcolor;
+	}
+
+	public Screen findScreenByFileName(final String lastSelectedPathComponent) {
+		checkNotNull(lastSelectedPathComponent);
+		Collection<Screen> filtered = Collections2.filter(screens, new Predicate<Screen>() {
+			@Override
+			public boolean apply(Screen input) {
+				return lastSelectedPathComponent.equals(input.getImage().getName());
+			}
+		});
+		checkState(filtered.size() == 1);
+		return filtered.iterator().next();
 	}
 }

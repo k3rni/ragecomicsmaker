@@ -13,13 +13,13 @@ import java.util.Collections;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class FileSelectedEvent {
+public class DirSelectedEvent {
 
 	private final File selectedDir;
 
-	private Comic comic;
+	private final Comic comic;
 
-	public FileSelectedEvent(File selectedDir) {
+	public DirSelectedEvent(File selectedDir) {
 		this.selectedDir = selectedDir;
 		this.comic = prepareModel();
 	}
@@ -46,7 +46,7 @@ public class FileSelectedEvent {
 	}
 
 	private Comic prepareModel() {
-		comic = new Comic();
+		Comic comic = new Comic();
 		comic.initDefaults();
 		Collection<File> images = getImages();
 		int i = 0;
