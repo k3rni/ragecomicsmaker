@@ -28,7 +28,8 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (image != null) {
-			g.drawImage(image, 0, 0, null);
+			Image scaledInstance = image.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+			g.drawImage(scaledInstance, 0, 0, null);
 		}
 	}
 
