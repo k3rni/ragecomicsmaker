@@ -32,7 +32,6 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 
 	public FilesPanel() {
 		super();
-		App.EVENT_BUS.register(this);
 		setLayout(new BorderLayout());
 		JButton openDirBtn = new JButton("Select Directory");
 		openDirBtn.addMouseListener(new SelectFileAction(this));
