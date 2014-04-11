@@ -43,6 +43,11 @@ public class FrameSizeCalculatorTest {
 		assertThat(frameRect.startY).isEqualTo(0.1, Delta.delta(0.01));
 		assertThat(frameRect.width).isEqualTo(0.5, Delta.delta(0.01));
 		assertThat(frameRect.height).isEqualTo(0.5, Delta.delta(0.01));
+	}
 
+	@Test
+	public void testCalculateSize() throws Exception {
+		int calculatedSize = fsc.calculateSize(0.5, 100);
+		assertThat(calculatedSize).isEqualTo(50);
 	}
 }

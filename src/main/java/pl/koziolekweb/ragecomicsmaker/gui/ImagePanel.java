@@ -58,7 +58,7 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener {
 					endX = e.getX();
 					endY = e.getY();
 					AddFrameEvent addFrameEvent = new AddFrameEvent(fsc.buildFrameRec(startX, startY,
-							rdm.countWidth(startX, endX), rdm.countWidth(startY, endY),
+							endX, endY,
 							scaledInstance.getWidth(null), scaledInstance.getHeight(null)), selectedScreen);
 					App.EVENT_BUS.post(addFrameEvent);
 					repaint();
@@ -101,8 +101,9 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener {
 					int scaledInstanceHeight = scaledInstance.getHeight(null);
 					rdm.setColor(new Color(r, g, b, a));
 					int sx = fsc.calculateSize(frame.getStartX(), scaledInstanceWidth);
-					int sy = fsc.calculateSize(frame.getStartY(), scaledInstanceHeight);
 					int w = fsc.calculateSize(frame.getSizeX(), scaledInstanceWidth);
+
+					int sy = fsc.calculateSize(frame.getStartY(), scaledInstanceHeight);
 					int h = fsc.calculateSize(frame.getSizeY(), scaledInstanceHeight);
 					rdm.paintRectangle(graphics, sx, sy, w, h);
 					r += 30;

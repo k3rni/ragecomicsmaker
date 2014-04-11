@@ -18,9 +18,9 @@ public class RectangleDrawingMagic {
 	}
 
 	/**
-	 * We could start with different  color
+	 * We could start with different color
 	 *
-	 * @param color
+	 * @param color if you hate BLACK!
 	 */
 	public RectangleDrawingMagic(Color color) {
 		this.color = color;
@@ -37,10 +37,10 @@ public class RectangleDrawingMagic {
 	 */
 	public void paintRectangle(Graphics g, int startX, int startY, int currentX, int currentY) {
 		g.setColor(color);
-		g.fillRect(findStartXPoint(startX, currentX),
-				findStartYPoint(startY, currentY),
-				countWidth(startX, currentX),
-				countHeight(startY, currentY)
+		g.fillRect(findStartPoint(startX, currentX),
+				findStartPoint(startY, currentY),
+				countSize(startX, currentX),
+				countSize(startY, currentY)
 		);
 	}
 
@@ -48,19 +48,12 @@ public class RectangleDrawingMagic {
 		this.color = color;
 	}
 
-	private int findStartXPoint(int startX, int currentX) {
-		return Math.min(startX, currentX);
+	private int findStartPoint(int start, int current) {
+		return Math.min(start, current);
 	}
 
-	private int findStartYPoint(int startY, int currentY) {
-		return Math.min(startY, currentY);
+	public int countSize(int start, int current) {
+		return Math.abs(start - current);
 	}
 
-	public int countWidth(int startX, int currentX) {
-		return Math.abs(startX - currentX);
-	}
-
-	public int countHeight(int startY, int currentY) {
-		return Math.abs(startY - currentY);
-	}
 }
