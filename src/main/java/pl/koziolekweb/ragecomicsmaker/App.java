@@ -41,6 +41,7 @@ public class App implements Runnable {
 
 		EVENT_BUS.register(imagePanel);
 		EVENT_BUS.register(filesPanel);
+		EVENT_BUS.register(framesPanel);
 
 		mainPanel.add(filesPanel);
 		mainPanel.add(imagePanel);

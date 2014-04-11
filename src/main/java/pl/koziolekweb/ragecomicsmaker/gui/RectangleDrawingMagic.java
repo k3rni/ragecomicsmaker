@@ -18,7 +18,7 @@ public class RectangleDrawingMagic {
 	}
 
 	/**
-	 * We could start with diffrent  color
+	 * We could start with different  color
 	 *
 	 * @param color
 	 */
@@ -56,11 +56,11 @@ public class RectangleDrawingMagic {
 		return Math.min(startY, currentY);
 	}
 
-	private int countWidth(int startX, int currentX) {
+	public int countWidth(int startX, int currentX) {
 		return Math.abs(startX - currentX);
 	}
 
-	private int countHeight(int startY, int currentY) {
+	public int countHeight(int startY, int currentY) {
 		return Math.abs(startY - currentY);
 	}
 }

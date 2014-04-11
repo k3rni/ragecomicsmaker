@@ -1,8 +1,12 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
+import com.google.common.eventbus.Subscribe;
+import pl.koziolekweb.ragecomicsmaker.event.AddFrameEvent;
+import pl.koziolekweb.ragecomicsmaker.event.AddFrameEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
+import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +18,7 @@ import java.util.TreeSet;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class FramesPanel extends JPanel implements ImageSelectedEventListener {
+public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener {
 
 	public FramesPanel() {
 		super();
@@ -32,6 +36,7 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener {
 	}
 
 	@Override
+	@Subscribe
 	public void handleDirSelectedEvent(ImageSelectedEvent event) {
 		TreeSet<Frame> frames = event.selectedScreen.getFrames();
 		for (Frame frame : frames) {
@@ -39,4 +44,20 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener {
 		}
 		updateUI();
 	}
+
+	@Override
+	@Subscribe
+	public void handelAddFrameEvent(AddFrameEvent event) {
+		Screen screen = event.screen;
+		Frame frame = new Frame(screen.getFrames().size());
+		frame.setStartX(event.frameRect.startX);
+		frame.setStartY(event.frameRect.startY);
+		frame.setSizeX(event.frameRect.width);
+		frame.setSizeY(event.frameRect.height);
+		frame.setTransitionDuration(1);
+		add(new FramePanel(frame));
+		screen.addFrame(frame);
+		updateUI();
+	}
 }
+
