@@ -78,4 +78,19 @@ public class Screen implements Serializable, Comparable<Screen> {
 		return start().compare(this.index, that.index)
 				.result();
 	}
+
+	public void removeFrame(Frame frame) {
+		frames.remove(frame);
+		recount();
+	}
+
+	private void recount() {
+		TreeSet<Frame> newFrames = new TreeSet<Frame>();
+		int i = 0;
+		for (Frame frame : frames) {
+			newFrames.add(new Frame(frame, i));
+			i++;
+		}
+		frames = newFrames;
+	}
 }

@@ -1,5 +1,6 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
+import org.fest.assertions.Delta;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -60,5 +61,54 @@ public class FrameTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testSetSizeYOver1() throws Exception {
 		frame.setSizeY(1.1);
+	}
+
+	@Test
+	public void testSetRelativeArea() throws Exception {
+		frame.setRelativeArea("0.10 0.20 0.30 0.40");
+		assertThat(frame.getStartX()).isEqualTo(0.1, Delta.delta(0.01));
+		assertThat(frame.getStartY()).isEqualTo(0.2, Delta.delta(0.01));
+		assertThat(frame.getSizeX()).isEqualTo(0.3, Delta.delta(0.01));
+		assertThat(frame.getSizeY()).isEqualTo(0.4, Delta.delta(0.01));
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea1Over1() throws Exception {
+		frame.setRelativeArea("1.10 0.20 0.30 0.40");
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea2Over1() throws Exception {
+		frame.setRelativeArea("0.10 1.20 0.30 0.40");
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea3Over1() throws Exception {
+		frame.setRelativeArea("0.10 0.20 1.30 0.40");
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea4Over1() throws Exception {
+		frame.setRelativeArea("0.10 0.20 0.30 1.40");
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea1Under0() throws Exception {
+		frame.setRelativeArea("-0.10 0.20 0.30 0.40");
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea2Under0() throws Exception {
+		frame.setRelativeArea("0.10 -0.20 0.30 0.40");
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea3Under0() throws Exception {
+		frame.setRelativeArea("0.10 0.20 -0.30 0.40");
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testSetRelativeArea4Under0() throws Exception {
+		frame.setRelativeArea("0.10 0.20 0.30 -0.40");
 	}
 }

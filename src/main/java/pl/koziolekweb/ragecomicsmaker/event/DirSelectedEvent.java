@@ -6,8 +6,8 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * TODO write JAVADOC!!!
@@ -24,13 +24,14 @@ public class DirSelectedEvent {
 		this.comic = prepareModel();
 	}
 
-	public Collection<File> getImages() {
+	public List<File> getImages() {
 		if (selectedDir == null)
 			return Collections.emptyList();
 		File[] files = selectedDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.toLowerCase().endsWith(".jpg");
+				return name.toLowerCase().endsWith(".jpg")
+						|| name.toLowerCase().endsWith(".png");
 			}
 		});
 
@@ -48,7 +49,8 @@ public class DirSelectedEvent {
 	private Comic prepareModel() {
 		Comic comic = new Comic();
 		comic.initDefaults();
-		Collection<File> images = getImages();
+		List<File> images = getImages();
+		Collections.sort(images);
 		int i = 0;
 		for (File image : images) {
 			Screen screen = new Screen();

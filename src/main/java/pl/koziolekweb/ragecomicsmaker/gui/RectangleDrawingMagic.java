@@ -44,6 +44,26 @@ public class RectangleDrawingMagic {
 		);
 	}
 
+	/**
+	 * Paint rectangle using current color.
+	 *
+	 * @param number   frame number
+	 * @param g        canvas
+	 * @param startX   mouse cord - mouse pressed
+	 * @param startY   mouse cord - mouse pressed
+	 * @param currentX mouse cord - mouse current position
+	 * @param currentY mouse cord - mouse current position
+	 */
+	public void paintFrameNumber(String number, Graphics g, int startX, int startY, int currentX, int currentY) {
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("Arial", Font.PLAIN, 32));
+		g.drawString(number, countPosition(startX, currentX), countPosition(startY, currentY));
+	}
+
+	private int countPosition(int start, int current) {
+		return start + ((Math.abs(current - start)) / 2);
+	}
+
 	public void setColor(Color color) {
 		this.color = color;
 	}
@@ -52,7 +72,7 @@ public class RectangleDrawingMagic {
 		return Math.min(start, current);
 	}
 
-	public int countSize(int start, int current) {
+	private int countSize(int start, int current) {
 		return Math.abs(start - current);
 	}
 

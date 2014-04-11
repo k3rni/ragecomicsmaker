@@ -50,6 +50,7 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 		Collection<Screen> images = comic.getScreens();
 		DefaultTreeModel model = (DefaultTreeModel) fileTree.getModel();
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+		root.removeAllChildren();
 		for (Screen image : images) {
 			DefaultMutableTreeNode child = new DefaultMutableTreeNode(image.getImage().getName());
 			root.add(child);

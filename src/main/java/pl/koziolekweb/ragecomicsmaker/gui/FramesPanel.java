@@ -1,62 +1,76 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
 import com.google.common.eventbus.Subscribe;
+import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.AddFrameEvent;
 import pl.koziolekweb.ragecomicsmaker.event.AddFrameEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEvent;
+import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.TreeSet;
 
 /**
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener {
+public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener, RemoveFrameEventListener {
+
+	private final GridBagConstraints gbc;
+	private Screen selectedScreen;
 
 	public FramesPanel() {
-		super();
-		JButton addFrame = new JButton("Add Frame");
-		add(addFrame);
-
-		addFrame.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				super.mouseClicked(e);
-				add(new JLabel("wqeqqeweqqeqeqq"));
-				updateUI();
-			}
-		});
+		super(new GridBagLayout());
+		gbc = new GridBagConstraints();
+		gbc.gridy = 0;
 	}
 
 	@Override
 	@Subscribe
 	public void handleDirSelectedEvent(ImageSelectedEvent event) {
-		TreeSet<Frame> frames = event.selectedScreen.getFrames();
-		for (Frame frame : frames) {
-			add(new Label(frame.getRelativeArea()));
+		removeAll();
+		gbc.gridy = 0;
+		selectedScreen = event.selectedScreen;
+		for (Frame frame : selectedScreen.getFrames()) {
+			addFrame(frame);
 		}
 		updateUI();
 	}
 
+	private void addFrame(Frame frame) {
+		gbc.gridx = 0;
+		gbc.gridy = gbc.gridy + 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		add(new FramePanel(frame), gbc);
+	}
+
+
 	@Override
 	@Subscribe
 	public void handelAddFrameEvent(AddFrameEvent event) {
-		Screen screen = event.screen;
-		Frame frame = new Frame(screen.getFrames().size());
+		selectedScreen = event.screen;
+		Frame frame = new Frame(selectedScreen.getFrames().size());
 		frame.setStartX(event.frameRect.startX);
 		frame.setStartY(event.frameRect.startY);
 		frame.setSizeX(event.frameRect.width);
 		frame.setSizeY(event.frameRect.height);
 		frame.setTransitionDuration(1);
-		add(new FramePanel(frame));
-		screen.addFrame(frame);
+		addFrame(frame);
+		selectedScreen.addFrame(frame);
+		updateUI();
+	}
+
+	@Override
+	@Subscribe
+	public void handleRemoveFrameEvent(RemoveFrameEvent event) {
+		remove(event.framePanel);
+		selectedScreen.removeFrame(event.framePanel.getFrame());
+		App.EVENT_BUS.post(new FrameDroppedEvent(event.framePanel.getFrame()));
 		updateUI();
 	}
 }

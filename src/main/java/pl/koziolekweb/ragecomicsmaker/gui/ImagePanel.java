@@ -4,6 +4,8 @@ import com.google.common.eventbus.Subscribe;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.FrameSizeCalculator;
 import pl.koziolekweb.ragecomicsmaker.event.AddFrameEvent;
+import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
@@ -23,7 +25,7 @@ import java.util.TreeSet;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class ImagePanel extends JPanel implements ImageSelectedEventListener {
+public class ImagePanel extends JPanel implements ImageSelectedEventListener, FrameDroppedEventListener {
 
 	private BufferedImage image;
 	private boolean paintNewFrame = false;
@@ -57,11 +59,14 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener {
 					paintNewFrame = false;
 					endX = e.getX();
 					endY = e.getY();
-					AddFrameEvent addFrameEvent = new AddFrameEvent(fsc.buildFrameRec(startX, startY,
-							endX, endY,
-							scaledInstance.getWidth(null), scaledInstance.getHeight(null)), selectedScreen);
-					App.EVENT_BUS.post(addFrameEvent);
-					repaint();
+					try {
+						AddFrameEvent addFrameEvent = new AddFrameEvent(fsc.buildFrameRec(startX, startY,
+								endX, endY,
+								scaledInstance.getWidth(null), scaledInstance.getHeight(null)), selectedScreen);
+						App.EVENT_BUS.post(addFrameEvent);
+					} finally {
+						repaint();
+					}
 				}
 			}
 
@@ -106,6 +111,7 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener {
 					int sy = fsc.calculateSize(frame.getStartY(), scaledInstanceHeight);
 					int h = fsc.calculateSize(frame.getSizeY(), scaledInstanceHeight);
 					rdm.paintRectangle(graphics, sx, sy, w, h);
+					rdm.paintFrameNumber(frame.getId() + "", graphics, sx, sy, w, h);
 					r += 30;
 					g += 30;
 					b += 30;
@@ -124,5 +130,11 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	@Subscribe
+	public void handleFrameDroppedEvent(FrameDroppedEvent event) {
+		repaint();
 	}
 }
