@@ -4,7 +4,7 @@
 
     <groupId>pl.koziolekweb.ragecomicsmaker</groupId>
     <artifactId>ragecomicsmaker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>ragecomicsmaker</name>
