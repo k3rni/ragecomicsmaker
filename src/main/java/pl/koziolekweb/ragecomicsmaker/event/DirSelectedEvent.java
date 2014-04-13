@@ -2,8 +2,11 @@ package pl.koziolekweb.ragecomicsmaker.event;
 
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
+import pl.koziolekweb.ragecomicsmaker.xml.XmlUnmarshaller;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,8 +33,7 @@ public class DirSelectedEvent {
 		File[] files = selectedDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.toLowerCase().endsWith(".jpg")
-						|| name.toLowerCase().endsWith(".png");
+				return name.matches("screen[0-9]+\\.(jpg|png)");
 			}
 		});
 
@@ -47,6 +49,25 @@ public class DirSelectedEvent {
 	}
 
 	private Comic prepareModel() {
+		File[] comicFileName = selectedDir.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().equals("comic.xml");
+			}
+		});
+		if (comicFileName.length == 1) {
+			try {
+				Comic from = (Comic) (XmlUnmarshaller.startUnmarshallOf(Comic.class).from(comicFileName[0]));
+				List<File> images = getImages();
+				Collections.sort(images);
+				for (Screen screen : from.getScreens()) {
+					screen.setImage(images.get(screen.getIndex()));
+				}
+				return from;
+			} catch (JAXBException e) {
+				e.printStackTrace();
+			}
+		}
 		Comic comic = new Comic();
 		comic.initDefaults();
 		List<File> images = getImages();

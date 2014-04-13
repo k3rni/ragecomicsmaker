@@ -5,6 +5,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TreeSet;
 
 import static com.google.common.collect.ComparisonChain.start;
@@ -13,22 +15,26 @@ import static com.google.common.collect.ComparisonChain.start;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+
+//@XmlRootElement
+//@XmlAccessorType(XmlAccessType.FIELD)
 public class Screen implements Serializable, Comparable<Screen> {
 
 	@XmlAttribute(required = true)
 	private int index;
+
 	@XmlAttribute(required = true)
 	private String bgcolor;
 
-	@XmlElement
-	private TreeSet<Frame> frames;
+	@XmlElement(name = "frame")
+	private Collection<Frame> frames;
 
 	// a teraz drogie dzieci nie xmlowa część modelu tzw. core
 	@XmlTransient
 	private File image;
 
 	public Screen() {
-		frames = new TreeSet<Frame>();
+		frames = new ArrayList<>();
 	}
 
 	@XmlTransient
@@ -62,13 +68,14 @@ public class Screen implements Serializable, Comparable<Screen> {
 		this.bgcolor = bgcolor;
 	}
 
-	@XmlTransient
-	public TreeSet<Frame> getFrames() {
-		return frames;
-	}
+	public Collection<Frame> getFrames() {
+		int i = 0;
+		for (Frame frame : frames) {
+			frame.setId(i);
+			i++;
+		}
 
-	public void setFrames(TreeSet<Frame> frames) {
-		this.frames = frames;
+		return frames;
 	}
 
 	@Override
@@ -93,4 +100,5 @@ public class Screen implements Serializable, Comparable<Screen> {
 		}
 		frames = newFrames;
 	}
+
 }

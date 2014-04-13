@@ -43,10 +43,10 @@ public class Comic implements Serializable {
 	private Images images;
 
 	@XmlElement(name = "screen")
-	private TreeSet<Screen> screens;
+	private TreeSet<Screen> screens = new TreeSet<Screen>();
 
 	public Comic() {
-		screens = new TreeSet<Screen>();
+		initDefaults();
 	}
 
 	/**
@@ -68,6 +68,7 @@ public class Comic implements Serializable {
 
 	public void addScreen(Screen screen) {
 		screens.add(screen);
+		images.setLength(screens.size());
 	}
 
 	@XmlTransient

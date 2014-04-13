@@ -16,13 +16,22 @@ public class FramePanel extends JPanel {
 	private final FramePanel _this = this;
 
 	public FramePanel(Frame frame) {
-		GridLayout mgr = new GridLayout(1, 2);
+		GridBagLayout mgr = new GridBagLayout();
+		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(mgr);
 		this.frame = frame;
-		add(new Label(this.frame.getRelativeArea()));
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+
+		add(new Label(this.frame.getRelativeArea()), gbc);
+
 		removeBtn = new JButton("X");
 		removeBtn.setSize(25, 25);
-		add(removeBtn);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		add(removeBtn, gbc);
 		removeBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

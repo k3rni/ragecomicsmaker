@@ -5,6 +5,7 @@ import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.gui.action.SaveAction;
 import pl.koziolekweb.ragecomicsmaker.gui.action.SelectFileAction;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
@@ -41,6 +42,10 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 		prepareFileTree();
 
 		JButton saveBtn = new JButton("Save comics.xml");
+		SaveAction saveAction = new SaveAction();
+		App.EVENT_BUS.register(saveAction);
+		saveBtn.addMouseListener(saveAction);
+
 		add(saveBtn, BorderLayout.PAGE_END);
 	}
 

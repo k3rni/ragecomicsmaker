@@ -80,6 +80,7 @@ public class Frame implements Serializable, Comparable<Frame> {
 
 	@XmlTransient
 	public double getStartX() {
+		recountValues();
 		return startX;
 	}
 
@@ -91,6 +92,7 @@ public class Frame implements Serializable, Comparable<Frame> {
 
 	@XmlTransient
 	public double getStartY() {
+		recountValues();
 		return startY;
 	}
 
@@ -102,6 +104,7 @@ public class Frame implements Serializable, Comparable<Frame> {
 
 	@XmlTransient
 	public double getSizeX() {
+		recountValues();
 		return sizeX;
 	}
 
@@ -113,6 +116,7 @@ public class Frame implements Serializable, Comparable<Frame> {
 
 	@XmlTransient
 	public double getSizeY() {
+		recountValues();
 		return sizeY;
 	}
 
@@ -125,6 +129,10 @@ public class Frame implements Serializable, Comparable<Frame> {
 	@XmlTransient
 	public int getId() {
 		return id;
+	}
+
+	public void setId(int i) {
+		id = i;
 	}
 
 	private void recountRelativeArea() {

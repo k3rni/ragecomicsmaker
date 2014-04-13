@@ -19,7 +19,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.TreeSet;
+import java.util.Collection;
 
 /**
  * TODO write JAVADOC!!!
@@ -95,16 +95,12 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 			}
 		}
 		if (selectedScreen != null) {
-			TreeSet<pl.koziolekweb.ragecomicsmaker.model.Frame> frames = selectedScreen.getFrames();
+			Collection<Frame> frames = selectedScreen.getFrames();
 			if (!frames.isEmpty()) {
-				int r = 30;
-				int g = 30;
-				int b = 30;
-				int a = 100;
 				for (Frame frame : frames) {
 					int scaledInstanceWidth = scaledInstance.getWidth(null);
 					int scaledInstanceHeight = scaledInstance.getHeight(null);
-					rdm.setColor(new Color(r, g, b, a));
+					rdm.setColor(new Color(130, 130, 130, 100));
 					int sx = fsc.calculateSize(frame.getStartX(), scaledInstanceWidth);
 					int w = fsc.calculateSize(frame.getSizeX(), scaledInstanceWidth);
 
@@ -112,9 +108,6 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 					int h = fsc.calculateSize(frame.getSizeY(), scaledInstanceHeight);
 					rdm.paintRectangle(graphics, sx, sy, w, h);
 					rdm.paintFrameNumber(frame.getId() + "", graphics, sx, sy, w, h);
-					r += 30;
-					g += 30;
-					b += 30;
 				}
 			}
 		}

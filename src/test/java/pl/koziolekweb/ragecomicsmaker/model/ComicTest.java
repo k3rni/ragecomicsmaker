@@ -18,6 +18,7 @@ public class ComicTest {
 	@BeforeMethod
 	public void setUp() throws Exception {
 		comic = new Comic();
+		comic.initDefaults();
 		comic.addScreen(buildScreen("s1"));
 		comic.addScreen(buildScreen("s2"));
 		comic.addScreen(buildScreen("s3"));

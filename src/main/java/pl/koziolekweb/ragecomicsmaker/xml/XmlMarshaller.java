@@ -12,32 +12,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Class to marshall pl.koziolekweb.model.* to comic.xml file;
  * User: koziolek
  */
-public class XmlMarshaler {
+public class XmlMarshaller {
 
 	private final Marshaller jaxbMarshaller;
 	private OutputStream file;
 
-	private XmlMarshaler(Class<?> clazz) throws JAXBException {
+	private XmlMarshaller(Class<?> clazz) throws JAXBException {
 		JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
 		jaxbMarshaller = jaxbContext.createMarshaller();
 		file = System.out;
 	}
 
-	public static XmlMarshaler startMarshallOf(Class<?> clazz) throws JAXBException {
-		return new XmlMarshaler(clazz);
+	public static XmlMarshaller startMarshallOf(Class<?> clazz) throws JAXBException {
+		return new XmlMarshaller(clazz);
 	}
 
-	public XmlMarshaler useFormattedOutput() throws PropertyException {
+	public XmlMarshaller useFormattedOutput() throws PropertyException {
 		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 		return this;
 	}
 
-	public XmlMarshaler useUnformattedOutput() throws PropertyException {
+	public XmlMarshaller useUnformattedOutput() throws PropertyException {
 		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 		return this;
 	}
 
-	public XmlMarshaler to(OutputStream file) throws PropertyException {
+	public XmlMarshaller to(OutputStream file) throws PropertyException {
 		this.file = file;
 		return this;
 	}

@@ -12,7 +12,7 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class XmlMarshalerTest {
+public class XmlMarshallerTest {
 
 	private Comic comic;
 
@@ -46,7 +46,7 @@ public class XmlMarshalerTest {
 
 	@Test
 	public void testMarshallToSysOut() throws Exception {
-		XmlMarshaler.startMarshallOf(Comic.class)
+		XmlMarshaller.startMarshallOf(Comic.class)
 				.useFormattedOutput()
 				.of(comic);
 	}
