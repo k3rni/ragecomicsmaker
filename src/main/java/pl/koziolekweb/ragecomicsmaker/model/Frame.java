@@ -22,7 +22,7 @@ public class Frame implements Serializable, Comparable<Frame> {
 	private String relativeArea;
 
 	@XmlAttribute(required = true)
-	private int transitionDuration;
+	private double transitionDuration;
 
 	@XmlTransient
 	private double startX;
@@ -70,11 +70,11 @@ public class Frame implements Serializable, Comparable<Frame> {
 	}
 
 	@XmlTransient
-	public int getTransitionDuration() {
+	public double getTransitionDuration() {
 		return transitionDuration;
 	}
 
-	public void setTransitionDuration(int transitionDuration) {
+	public void setTransitionDuration(double transitionDuration) {
 		this.transitionDuration = transitionDuration;
 	}
 
