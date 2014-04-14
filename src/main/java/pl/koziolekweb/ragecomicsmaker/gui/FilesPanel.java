@@ -15,6 +15,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.File;
 import java.util.Collection;
@@ -57,8 +58,11 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 		root.removeAllChildren();
 		for (Screen image : images) {
-			DefaultMutableTreeNode child = new DefaultMutableTreeNode(image.getImage().getName());
-			root.add(child);
+			File image1 = image.getImage();
+			if (image1 != null) {
+				DefaultMutableTreeNode child = new DefaultMutableTreeNode(image1.getName());
+				root.add(child);
+			}
 		}
 		model.reload(root);
 		this.curentProjectDir = event.getSelectedDir();
@@ -76,7 +80,9 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 	private class ImageFIleTreeSelectionListener implements TreeSelectionListener {
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
-			Screen selectedScreen = comic.findScreenByFileName(e.getNewLeadSelectionPath().getLastPathComponent().toString());
+			TreePath newLeadSelectionPath = e.getNewLeadSelectionPath();
+			if (newLeadSelectionPath == null) return;
+			Screen selectedScreen = comic.findScreenByFileName(newLeadSelectionPath.getLastPathComponent().toString());
 			App.EVENT_BUS.post(new ImageSelectedEvent(comic, selectedScreen));
 		}
 	}

@@ -1,6 +1,9 @@
 package pl.koziolekweb.ragecomicsmaker;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
+import pl.koziolekweb.ragecomicsmaker.event.ErrorEventListener;
 import pl.koziolekweb.ragecomicsmaker.gui.FilesPanel;
 import pl.koziolekweb.ragecomicsmaker.gui.FramesPanel;
 import pl.koziolekweb.ragecomicsmaker.gui.ImagePanel;
@@ -11,9 +14,10 @@ import java.awt.*;
 /**
  * Hello world!
  */
-public class App implements Runnable {
+public class App implements Runnable, ErrorEventListener {
 
 	public static final EventBus EVENT_BUS = new EventBus();
+	private JFrame main;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new App());
@@ -21,7 +25,7 @@ public class App implements Runnable {
 
 	@Override
 	public void run() {
-		JFrame main = new JFrame("Rage Comics Maker");
+		main = new JFrame("Rage Comics Maker");
 		main.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		main.setMinimumSize(new Dimension(640, 480));
 		mainPanel(main);
@@ -42,6 +46,8 @@ public class App implements Runnable {
 		EVENT_BUS.register(imagePanel);
 		EVENT_BUS.register(filesPanel);
 		EVENT_BUS.register(framesPanel);
+		EVENT_BUS.register(this);
+
 
 		mainPanel.add(filesPanel);
 		mainPanel.add(imagePanel);
@@ -64,5 +70,11 @@ public class App implements Runnable {
 		springLayout.putConstraint(SpringLayout.WEST, framesPanel, -250, SpringLayout.EAST, mainPanel);
 		springLayout.putConstraint(SpringLayout.EAST, framesPanel, 5, SpringLayout.EAST, mainPanel);
 
+	}
+
+	@Override
+	@Subscribe
+	public void handleErrorEvent(ErrorEvent event) {
+		JOptionPane.showConfirmDialog(main, event.message, "UWAGA!", JOptionPane.CLOSED_OPTION);
 	}
 }

@@ -2,6 +2,8 @@ package pl.koziolekweb.ragecomicsmaker.model;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import pl.koziolekweb.ragecomicsmaker.App;
+import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.xml.DirectionAdapter;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -9,6 +11,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.TreeSet;
@@ -157,10 +160,31 @@ public class Comic implements Serializable {
 		Collection<Screen> filtered = Collections2.filter(screens, new Predicate<Screen>() {
 			@Override
 			public boolean apply(Screen input) {
-				return lastSelectedPathComponent.equals(input.getImage().getName());
+				File image = input.getImage();
+				if (image == null) return false;
+				return lastSelectedPathComponent.equals(image.getName());
 			}
 		});
 		checkState(filtered.size() == 1);
 		return filtered.iterator().next();
+	}
+
+	public Screen findScreenByIndex(String number) {
+		try {
+			final int intNumber = Integer.parseInt(number);
+			Collection<Screen> filtered = Collections2.filter(screens, new Predicate<Screen>() {
+				@Override
+				public boolean apply(Screen input) {
+
+					return input.getIndex() == intNumber;
+				}
+			});
+			if (filtered.iterator().hasNext())
+				return filtered.iterator().next();
+			return new Screen(); // tak naprawdę do niczego nie podpiety null object
+		} catch (Exception e) {
+			App.EVENT_BUS.post(new ErrorEvent("Nieoczekiwany błąd odczytu - nueprawidłowy numer pliku " + number, e));
+			return new Screen();
+		}
 	}
 }
