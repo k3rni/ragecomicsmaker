@@ -21,6 +21,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collection;
 
+import static java.awt.image.BufferedImage.TYPE_4BYTE_ABGR;
+
 /**
  * TODO write JAVADOC!!!
  * User: koziolek
@@ -86,12 +88,14 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 	@Override
 	protected void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);
+		BufferedImage off = new BufferedImage(getWidth(), getHeight(), TYPE_4BYTE_ABGR);
+		Graphics buffer = off.getGraphics();
 		if (image != null) {
 			scaledInstance = image.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-			graphics.drawImage(scaledInstance, 0, 0, null);
+			buffer.drawImage(scaledInstance, 0, 0, null);
 			if (paintNewFrame) {
 				rdm.setColor(new Color(200, 200, 200, 200));
-				rdm.paintRectangle(graphics, startX, startY, currentX, currentY);
+				rdm.paintRectangle(buffer, startX, startY, currentX, currentY);
 			}
 		}
 		if (selectedScreen != null) {
@@ -106,11 +110,12 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 
 					int sy = fsc.calculateSize(frame.getStartY(), scaledInstanceHeight);
 					int h = fsc.calculateSize(frame.getSizeY(), scaledInstanceHeight);
-					rdm.paintRectangle(graphics, sx, sy, w, h);
-					rdm.paintFrameNumber(frame.getId() + "", graphics, sx, sy, w, h);
+					rdm.paintRectangle(buffer, sx, sy, w, h);
+					rdm.paintFrameNumber(frame.getId() + "", buffer, sx, sy, w, h);
 				}
 			}
 		}
+		graphics.drawImage(off, 0, 0, null);
 	}
 
 	@Override

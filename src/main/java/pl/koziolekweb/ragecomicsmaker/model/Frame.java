@@ -170,4 +170,14 @@ public class Frame implements Serializable, Comparable<Frame> {
 			return 1;
 		return start().compare(this.id, that.id).result();
 	}
+
+	// trochę dodatkowej logiki, bo już nie wyrabiam...
+
+	public double centerX() {
+		return startX + (sizeX / 2);
+	}
+
+	public double centerY() {
+		return startY + (sizeY / 2);
+	}
 }
