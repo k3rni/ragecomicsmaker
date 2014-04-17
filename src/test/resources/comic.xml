@@ -11,7 +11,7 @@
 	</screen>
 	<screen index="2" bgcolor="#ffffff">
 		<frame relativeArea="0.001 0.003 0.52 0.22" transitionDuration="0.8" />
-		<frame relativeArea="0.001 0.003 0.93 0.48" transitionDuration="0.8" />
+	    <frame relativeArea="0.001 0.003 0.93 0.48" transitionDuration="0.8" />
 		<frame relativeArea="0.048 0.42 0.26 0.31" transitionDuration="0.8" />
 		<frame relativeArea="0.31 0.48 0.60 0.24" transitionDuration="0.8" />
 		<frame relativeArea="0.048 0.73 0.86 0.27" transitionDuration="0.8" />
