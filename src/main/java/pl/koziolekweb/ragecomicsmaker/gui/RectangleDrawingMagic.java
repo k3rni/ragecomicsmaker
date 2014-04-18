@@ -22,6 +22,7 @@ public class RectangleDrawingMagic {
      *
      * @param color if you hate BLACK!
      */
+    @SuppressWarnings("unused")
     public RectangleDrawingMagic(Color color) {
         this.color = color;
     }
@@ -45,9 +46,9 @@ public class RectangleDrawingMagic {
 
     }
 
-    public void paintFrame(Graphics g, int startX, int startY, int currentX, int currentY) {
+    public void paintFrame(Graphics g, int startX, int startY, int width, int height) {
         g.setColor(color);
-        g.fillRect(startX, startY, startX + currentX, startY + currentY);
+        g.fillRect(startX, startY, width, height);
     }
 
     /**
@@ -67,7 +68,7 @@ public class RectangleDrawingMagic {
     }
 
     private int countPosition(int start, int current) {
-        return (start + current) / 2;
+        return start + (current / 2);
     }
 
     public void setColor(Color color) {
