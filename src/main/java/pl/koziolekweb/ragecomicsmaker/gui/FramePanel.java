@@ -29,9 +29,9 @@ public class FramePanel extends JPanel {
 		removeBtn = new JButton("X");
 		removeBtn.setSize(25, 25);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		add(removeBtn, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        add(removeBtn, gbc);
 		removeBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

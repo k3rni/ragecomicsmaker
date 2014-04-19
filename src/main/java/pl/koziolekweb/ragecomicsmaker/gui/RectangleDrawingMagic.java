@@ -62,6 +62,8 @@ public class RectangleDrawingMagic {
      * @param currentY mouse cord - mouse current position
      */
     public void paintFrameNumber(String number, Graphics g, int startX, int startY, int currentX, int currentY) {
+        g.setColor(Color.YELLOW);
+        g.fillRect(countPosition(startX, currentX) - 8, countPosition(startY, currentY) - 28, 32, 32);
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.PLAIN, 32));
         g.drawString(number, countPosition(startX, currentX), countPosition(startY, currentY));
