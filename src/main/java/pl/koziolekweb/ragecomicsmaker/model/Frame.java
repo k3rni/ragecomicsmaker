@@ -18,157 +18,176 @@ import static java.util.Arrays.asList;
  */
 public class Frame implements Serializable, Comparable<Frame> {
 
-	@XmlAttribute(required = true)
-	private String relativeArea;
+    @XmlAttribute(required = true)
+    private String relativeArea;
 
-	@XmlAttribute(required = true)
-	private double transitionDuration;
+    @XmlAttribute(required = true)
+    private double transitionDuration;
 
-	@XmlTransient
-	private double startX;
+    @XmlTransient
+    private double startX;
 
-	@XmlTransient
-	private double startY;
+    @XmlTransient
+    private double startY;
 
-	@XmlTransient
-	private double sizeX;
+    @XmlTransient
+    private double sizeX;
 
-	@XmlTransient
-	private double sizeY;
+    @XmlTransient
+    private double sizeY;
 
-	@XmlTransient
-	private int id;
+    @XmlTransient
+    private int id;
 
-	public Frame() {
-		//
-	}
-
-	public Frame(int id) {
-		this.id = id;
-	}
-
-	public Frame(Frame other, int newId) {
-		this.relativeArea = other.relativeArea;
-		this.transitionDuration = other.transitionDuration;
-		this.startX = other.startX;
-		this.startY = other.startY;
-		this.sizeX = other.sizeX;
-		this.sizeY = other.sizeY;
-		this.id = newId;
-	}
+    /**
+     * Frame is visible by default. This field is @XmlTransient and will be ignored by JAXB (un)marshaller.
+     */
+    @XmlTransient
+    private boolean visibility = true;
 
 
-	@XmlTransient
-	public String getRelativeArea() {
-		return relativeArea;
-	}
+    public Frame() {
+        //
+    }
 
-	public void setRelativeArea(String relativeArea) {
-		checkArgument(relativeArea.matches("\\d.\\d\\d \\d.\\d\\d \\d.\\d\\d \\d.\\d\\d"));
-		this.relativeArea = relativeArea;
-		recountValues();
-	}
+    public Frame(int id) {
+        this.id = id;
+    }
 
-	@XmlTransient
-	public double getTransitionDuration() {
-		return transitionDuration;
-	}
+    public Frame(Frame other, int newId) {
+        this.relativeArea = other.relativeArea;
+        this.transitionDuration = other.transitionDuration;
+        this.startX = other.startX;
+        this.startY = other.startY;
+        this.sizeX = other.sizeX;
+        this.sizeY = other.sizeY;
+        this.id = newId;
+    }
 
-	public void setTransitionDuration(double transitionDuration) {
-		this.transitionDuration = transitionDuration;
-	}
+    @XmlTransient
+    public boolean isVisible() {
+        return visibility;
+    }
 
-	@XmlTransient
-	public double getStartX() {
-		recountValues();
-		return startX;
-	}
+    public void visible() {
+        this.visibility = true;
+    }
 
-	public void setStartX(double startX) {
-		checkArgument(startX <= 1.00);
-		this.startX = startX;
-		recountRelativeArea();
-	}
+    public void unvisible() {
+        this.visibility = false;
+    }
 
-	@XmlTransient
-	public double getStartY() {
-		recountValues();
-		return startY;
-	}
+    @XmlTransient
+    public String getRelativeArea() {
+        return relativeArea;
+    }
 
-	public void setStartY(double startY) {
-		checkArgument(startY <= 1.00);
-		this.startY = startY;
-		recountRelativeArea();
-	}
+    public void setRelativeArea(String relativeArea) {
+        checkArgument(relativeArea.matches("\\d.\\d\\d\\d? \\d.\\d\\d\\d? \\d.\\d\\d\\d? \\d.\\d\\d\\d?"));
+        this.relativeArea = relativeArea;
+        recountValues();
+    }
 
-	@XmlTransient
-	public double getSizeX() {
-		recountValues();
-		return sizeX;
-	}
+    @XmlTransient
+    public double getTransitionDuration() {
+        return transitionDuration;
+    }
 
-	public void setSizeX(double sizeX) {
-		checkArgument(sizeX <= 1.00);
-		this.sizeX = sizeX;
-		recountRelativeArea();
-	}
+    public void setTransitionDuration(double transitionDuration) {
+        this.transitionDuration = transitionDuration;
+    }
 
-	@XmlTransient
-	public double getSizeY() {
-		recountValues();
-		return sizeY;
-	}
+    @XmlTransient
+    public double getStartX() {
+        recountValues();
+        return startX;
+    }
 
-	public void setSizeY(double sizeY) {
-		checkArgument(sizeY <= 1.00);
-		this.sizeY = sizeY;
-		recountRelativeArea();
-	}
+    public void setStartX(double startX) {
+        checkArgument(startX <= 1.00);
+        this.startX = startX;
+        recountRelativeArea();
+    }
 
-	@XmlTransient
-	public int getId() {
-		return id;
-	}
+    @XmlTransient
+    public double getStartY() {
+        recountValues();
+        return startY;
+    }
 
-	public void setId(int i) {
-		id = i;
-	}
+    public void setStartY(double startY) {
+        checkArgument(startY <= 1.00);
+        this.startY = startY;
+        recountRelativeArea();
+    }
 
-	private void recountRelativeArea() {
-		relativeArea = String.format(Locale.ENGLISH, "%.2f %.2f %.2f %.2f", startX, startY, sizeX, sizeY);
-	}
+    @XmlTransient
+    public double getSizeX() {
+        recountValues();
+        return sizeX;
+    }
 
-	private void recountValues() {
-		String[] split = relativeArea.split(" ");
-		Double[] doubles =
-				transform(
-						transform(asList(split), new Function<String, Double>() {
-							@Override
-							public Double apply(String input) {
-								return Double.valueOf(input);
-							}
-						}), new Function<Double, Double>() {
-							@Override
-							public Double apply(Double input) {
-								checkArgument(input >= 0.);
-								checkArgument(input <= 1.);
-								return input;
-							}
-						}
-				).toArray(new Double[4]);
-		startX = doubles[0];
-		startY = doubles[1];
-		sizeX = doubles[2];
-		sizeY = doubles[3];
+    public void setSizeX(double sizeX) {
+        checkArgument(sizeX <= 1.00);
+        this.sizeX = sizeX;
+        recountRelativeArea();
+    }
 
-	}
+    @XmlTransient
+    public double getSizeY() {
+        recountValues();
+        return sizeY;
+    }
 
-	@Override
-	public int compareTo(Frame that) {
-		if (that == null)
-			return 1;
-		return start().compare(this.id, that.id).result();
-	}
+    public void setSizeY(double sizeY) {
+        checkArgument(sizeY <= 1.00);
+        this.sizeY = sizeY;
+        recountRelativeArea();
+    }
+
+    @XmlTransient
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int i) {
+        id = i;
+    }
+
+    private void recountRelativeArea() {
+        relativeArea = String.format(Locale.ENGLISH, "%.3f %.3f %.3f %.3f", startX, startY, sizeX, sizeY);
+    }
+
+    private void recountValues() {
+        String[] split = relativeArea.split(" ");
+        Double[] doubles =
+                transform(
+                        transform(asList(split), new Function<String, Double>() {
+                            @Override
+                            public Double apply(String input) {
+                                return Double.valueOf(input);
+                            }
+                        }), new Function<Double, Double>() {
+                            @Override
+                            public Double apply(Double input) {
+                                checkArgument(input >= 0.);
+                                checkArgument(input <= 1.);
+                                return input;
+                            }
+                        }
+                ).toArray(new Double[4]);
+        startX = doubles[0];
+        startY = doubles[1];
+        sizeX = doubles[2];
+        sizeY = doubles[3];
+
+    }
+
+    @Override
+    public int compareTo(Frame that) {
+        if (that == null)
+            return 1;
+        return start().compare(this.id, that.id).result();
+    }
 
 }

@@ -2,13 +2,7 @@ package pl.koziolekweb.ragecomicsmaker.gui;
 
 import com.google.common.eventbus.Subscribe;
 import pl.koziolekweb.ragecomicsmaker.App;
-import pl.koziolekweb.ragecomicsmaker.event.AddFrameEvent;
-import pl.koziolekweb.ragecomicsmaker.event.AddFrameEventListener;
-import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEvent;
-import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
-import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
-import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEvent;
-import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.*;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
@@ -19,7 +13,7 @@ import java.awt.*;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener, RemoveFrameEventListener {
+public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener, RemoveFrameEventListener, DirSelectedEventListener {
 
 	private final GridBagConstraints gbc;
 	private Screen selectedScreen;
@@ -73,5 +67,10 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener, A
 		App.EVENT_BUS.post(new FrameDroppedEvent(event.framePanel.getFrame()));
 		updateUI();
 	}
+
+    @Override
+    public void handleDirSelectedEvent(DirSelectedEvent event) {
+        removeAll();
+    }
 }
 

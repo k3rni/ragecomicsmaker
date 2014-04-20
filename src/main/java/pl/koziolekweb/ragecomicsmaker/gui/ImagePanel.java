@@ -23,7 +23,7 @@ import static java.awt.image.BufferedImage.TYPE_4BYTE_ABGR;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class ImagePanel extends JPanel implements ImageSelectedEventListener, FrameDroppedEventListener {
+public class ImagePanel extends JPanel implements ImageSelectedEventListener, FrameDroppedEventListener, DirSelectedEventListener, FrameStateChangeEventListener {
 
     private BufferedImage image;
     private boolean paintNewFrame = false;
@@ -98,16 +98,18 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
             Collection<Frame> frames = selectedScreen.getFrames();
             if (!frames.isEmpty()) {
                 for (Frame frame : frames) {
-                    int scaledInstanceWidth = scaledInstance.getWidth(null);
-                    int scaledInstanceHeight = scaledInstance.getHeight(null);
-                    int sx = fsc.calculateSize(frame.getStartX(), scaledInstanceWidth);
-                    int w = fsc.calculateSize(frame.getSizeX(), scaledInstanceWidth);
-                    int sy = fsc.calculateSize(frame.getStartY(), scaledInstanceHeight);
-                    int h = fsc.calculateSize(frame.getSizeY(), scaledInstanceHeight);
+                    if (frame.isVisible()) {
+                        int scaledInstanceWidth = scaledInstance.getWidth(null);
+                        int scaledInstanceHeight = scaledInstance.getHeight(null);
+                        int sx = fsc.calculateSize(frame.getStartX(), scaledInstanceWidth);
+                        int w = fsc.calculateSize(frame.getSizeX(), scaledInstanceWidth);
+                        int sy = fsc.calculateSize(frame.getStartY(), scaledInstanceHeight);
+                        int h = fsc.calculateSize(frame.getSizeY(), scaledInstanceHeight);
 
-                    rdm.setColor(new Color(130, 130, 130, 100));
-                    rdm.paintFrame(buffer, sx, sy, w, h);
-                    rdm.paintFrameNumber(frame.getId() + "", buffer, sx, sy, w, h);
+                        rdm.setColor(new Color(130, 130, 130, 100));
+                        rdm.paintFrame(buffer, sx, sy, w, h);
+                        rdm.paintFrameNumber(frame.getId() + "", buffer, sx, sy, w, h);
+                    }
                 }
             }
         }
@@ -129,6 +131,19 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
     @Override
     @Subscribe
     public void handleFrameDroppedEvent(FrameDroppedEvent event) {
+        repaint();
+    }
+
+    @Override
+    public void handleDirSelectedEvent(DirSelectedEvent event) {
+        this.image = null;
+        this.scaledInstance = null;
+        this.selectedScreen = null;
+        this.paintNewFrame = false;
+    }
+
+    @Override
+    public void handelFrameStateChangeEvent(FrameStateChangeEvent event) {
         repaint();
     }
 }
