@@ -3,7 +3,15 @@ package pl.koziolekweb.ragecomicsmaker.gui;
 import com.google.common.eventbus.Subscribe;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.FrameSizeCalculator;
-import pl.koziolekweb.ragecomicsmaker.event.*;
+import pl.koziolekweb.ragecomicsmaker.event.AddFrameEvent;
+import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.FrameStateChangeEvent;
+import pl.koziolekweb.ragecomicsmaker.event.FrameStateChangeEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
@@ -58,8 +66,9 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
                     endX = e.getX();
                     endY = e.getY();
                     try {
-                        AddFrameEvent addFrameEvent = new AddFrameEvent(fsc.buildFrameRec(startX, startY,
-                                Math.abs(startX - endX), Math.abs(startY - endY),
+	                    AddFrameEvent addFrameEvent = new AddFrameEvent(fsc.buildFrameRec(
+			                    Math.min(startX, endX), Math.min(startY, endY),
+			                    Math.abs(startX - endX), Math.abs(startY - endY),
                                 scaledInstance.getWidth(null), scaledInstance.getHeight(null)), selectedScreen);
                         App.EVENT_BUS.post(addFrameEvent);
                     } finally {
