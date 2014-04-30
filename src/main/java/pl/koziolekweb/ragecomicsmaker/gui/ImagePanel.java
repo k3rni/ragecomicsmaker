@@ -123,6 +123,7 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
             }
         }
         graphics.drawImage(off, 0, 0, null);
+	    buffer.dispose();
     }
 
     @Override
