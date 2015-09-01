@@ -27,21 +27,21 @@ public class FrameTest {
 		frame.setSizeX(0.);
 		frame.setSizeY(0.);
 		//then
-        assertThat(frame.getRelativeArea()).isEqualTo("0.000 0.000 0.000 0.000");
+		assertThat(frame.getRelativeArea()).isEqualTo("0.000 0.000 0.000 0.000");
 
 		//change one by one
 		frame.setStartX(0.1);
-        assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.000 0.000 0.000");
+		assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.000 0.000 0.000");
 
 		frame.setStartY(0.2);
-        assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.200 0.000 0.000");
+		assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.200 0.000 0.000");
 
 		frame.setSizeX(0.3);
-        assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.200 0.300 0.000");
+		assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.200 0.300 0.000");
 
 		frame.setSizeY(0.4);
-        assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.200 0.300 0.400");
-    }
+		assertThat(frame.getRelativeArea()).isEqualTo("0.100 0.200 0.300 0.400");
+	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testSetStartXOver1() throws Exception {

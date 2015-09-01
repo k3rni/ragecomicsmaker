@@ -8,7 +8,7 @@ import com.google.common.eventbus.Subscribe;
  */
 public interface DirSelectedEventListener {
 
-    @Subscribe
-    public void handleDirSelectedEvent(DirSelectedEvent event);
+	@Subscribe
+	public void handleDirSelectedEvent(DirSelectedEvent event);
 
 }

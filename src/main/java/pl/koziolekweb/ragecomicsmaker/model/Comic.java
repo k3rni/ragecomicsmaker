@@ -183,7 +183,7 @@ public class Comic implements Serializable {
 				return filtered.iterator().next();
 			return new Screen(); // tak naprawdę do niczego nie podpiety null object
 		} catch (Exception e) {
-			App.EVENT_BUS.post(new ErrorEvent("Nieoczekiwany błąd odczytu - nueprawidłowy numer pliku " + number, e));
+			App.EVENT_BUS.post(new ErrorEvent("Nieoczekiwany błąd odczytu - nieprawidłowy numer pliku " + number, e));
 			return new Screen();
 		}
 	}

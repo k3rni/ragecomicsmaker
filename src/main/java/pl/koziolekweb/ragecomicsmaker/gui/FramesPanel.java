@@ -2,7 +2,15 @@ package pl.koziolekweb.ragecomicsmaker.gui;
 
 import com.google.common.eventbus.Subscribe;
 import pl.koziolekweb.ragecomicsmaker.App;
-import pl.koziolekweb.ragecomicsmaker.event.*;
+import pl.koziolekweb.ragecomicsmaker.event.AddFrameEvent;
+import pl.koziolekweb.ragecomicsmaker.event.AddFrameEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEvent;
+import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
@@ -68,9 +76,9 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener, A
 		updateUI();
 	}
 
-    @Override
-    public void handleDirSelectedEvent(DirSelectedEvent event) {
-        removeAll();
-    }
+	@Override
+	public void handleDirSelectedEvent(DirSelectedEvent event) {
+		removeAll();
+	}
 }
 

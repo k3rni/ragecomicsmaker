@@ -7,9 +7,9 @@ import pl.koziolekweb.ragecomicsmaker.model.Frame;
  */
 public class FrameStateChangeEvent {
 
-    public final Frame frame;
+	public final Frame frame;
 
-    public FrameStateChangeEvent(Frame frame) {
-        this.frame = frame;
-    }
+	public FrameStateChangeEvent(Frame frame) {
+		this.frame = frame;
+	}
 }

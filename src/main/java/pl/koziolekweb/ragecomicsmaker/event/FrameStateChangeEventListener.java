@@ -7,6 +7,6 @@ import com.google.common.eventbus.Subscribe;
  */
 public interface FrameStateChangeEventListener {
 
-    @Subscribe
-    public void handelFrameStateChangeEvent(FrameStateChangeEvent event);
+	@Subscribe
+	public void handelFrameStateChangeEvent(FrameStateChangeEvent event);
 }

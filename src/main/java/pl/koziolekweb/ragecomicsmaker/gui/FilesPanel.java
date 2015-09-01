@@ -27,61 +27,61 @@ import static javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION;
  */
 public class FilesPanel extends JPanel implements DirSelectedEventListener {
 
-    private JTree fileTree;
-    private File curentProjectDir;
-    private Comic comic;
+	private JTree fileTree;
+	private File curentProjectDir;
+	private Comic comic;
 
-    public FilesPanel() {
-        super();
-        setLayout(new BorderLayout());
-        JButton openDirBtn = new JButton("Select Directory");
-        openDirBtn.addMouseListener(new SelectFileAction(this));
+	public FilesPanel() {
+		super();
+		setLayout(new BorderLayout());
+		JButton openDirBtn = new JButton("Select Directory");
+		openDirBtn.addMouseListener(new SelectFileAction(this));
 
-        add(openDirBtn, BorderLayout.PAGE_START);
+		add(openDirBtn, BorderLayout.PAGE_START);
 
-        prepareFileTree();
+		prepareFileTree();
 
-        JButton saveBtn = new JButton("Save comics.xml");
-        SaveAction saveAction = new SaveAction();
-        App.EVENT_BUS.register(saveAction);
-        saveBtn.addMouseListener(saveAction);
+		JButton saveBtn = new JButton("Save comics.xml");
+		SaveAction saveAction = new SaveAction();
+		App.EVENT_BUS.register(saveAction);
+		saveBtn.addMouseListener(saveAction);
 
-        add(saveBtn, BorderLayout.PAGE_END);
-    }
+		add(saveBtn, BorderLayout.PAGE_END);
+	}
 
-    public void handleDirSelectedEvent(DirSelectedEvent event) {
-        this.comic = event.getModel();
-        Collection<Screen> images = comic.getScreens();
-        DefaultTreeModel model = (DefaultTreeModel) fileTree.getModel();
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-        root.removeAllChildren();
-        for (Screen image : images) {
-            File image1 = image.getImage();
-            if (image1 != null) {
-                DefaultMutableTreeNode child = new DefaultMutableTreeNode(image1.getName());
-                root.add(child);
-            }
-        }
-        model.reload(root);
-        this.curentProjectDir = event.getSelectedDir();
-    }
+	public void handleDirSelectedEvent(DirSelectedEvent event) {
+		this.comic = event.getModel();
+		Collection<Screen> images = comic.getScreens();
+		DefaultTreeModel model = (DefaultTreeModel) fileTree.getModel();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+		root.removeAllChildren();
+		for (Screen image : images) {
+			File image1 = image.getImage();
+			if (image1 != null) {
+				DefaultMutableTreeNode child = new DefaultMutableTreeNode(image1.getName());
+				root.add(child);
+			}
+		}
+		model.reload(root);
+		this.curentProjectDir = event.getSelectedDir();
+	}
 
-    private JScrollPane prepareFileTree() {
-        fileTree = new JTree(new String[]{});
-        fileTree.getSelectionModel().setSelectionMode(SINGLE_TREE_SELECTION);
-        fileTree.addTreeSelectionListener(new ImageFIleTreeSelectionListener());
-        JScrollPane jsp = new JScrollPane(fileTree);
-        add(jsp, BorderLayout.CENTER);
-        return jsp;
-    }
+	private JScrollPane prepareFileTree() {
+		fileTree = new JTree(new String[]{});
+		fileTree.getSelectionModel().setSelectionMode(SINGLE_TREE_SELECTION);
+		fileTree.addTreeSelectionListener(new ImageFIleTreeSelectionListener());
+		JScrollPane jsp = new JScrollPane(fileTree);
+		add(jsp, BorderLayout.CENTER);
+		return jsp;
+	}
 
-    private class ImageFIleTreeSelectionListener implements TreeSelectionListener {
-        @Override
-        public void valueChanged(TreeSelectionEvent e) {
-            TreePath newLeadSelectionPath = e.getNewLeadSelectionPath();
-            if (newLeadSelectionPath == null) return;
-            Screen selectedScreen = comic.findScreenByFileName(newLeadSelectionPath.getLastPathComponent().toString());
-            App.EVENT_BUS.post(new ImageSelectedEvent(comic, selectedScreen));
-        }
-    }
+	private class ImageFIleTreeSelectionListener implements TreeSelectionListener {
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			TreePath newLeadSelectionPath = e.getNewLeadSelectionPath();
+			if (newLeadSelectionPath == null) return;
+			Screen selectedScreen = comic.findScreenByFileName(newLeadSelectionPath.getLastPathComponent().toString());
+			App.EVENT_BUS.post(new ImageSelectedEvent(comic, selectedScreen));
+		}
+	}
 }

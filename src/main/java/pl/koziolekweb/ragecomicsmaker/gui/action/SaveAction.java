@@ -22,36 +22,36 @@ import java.util.Date;
 public class SaveAction extends MouseAdapter implements DirSelectedEventListener {
 
 
-    private Comic comic;
-    private File targetDir;
-    private SimpleDateFormat sdf = new SimpleDateFormat();
+	private Comic comic;
+	private File targetDir;
+	private SimpleDateFormat sdf = new SimpleDateFormat();
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        super.mouseClicked(e);
-        try {
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		super.mouseClicked(e);
+		try {
 
-            String name = targetDir.getAbsolutePath() + File.separator + "comic.xml";
-            File comicFile = new File(name);
-            if (comicFile.exists()) {
-                File backup = new File(targetDir.getAbsolutePath() + File.separator + "backup-" +
-                        sdf.format(new Date())
-                        + "-comic.xml");
-                Files.move(comicFile, backup);
-            }
-            comicFile.createNewFile();
-            XmlMarshaller.startMarshallOf(Comic.class)
-                    .useFormattedOutput()
-                    .to(new FileOutputStream(name))
-                    .of(comic);
-        } catch (JAXBException | IOException e1) {
-            e1.printStackTrace();
-        }
-    }
+			String name = targetDir.getAbsolutePath() + File.separator + "comic.xml";
+			File comicFile = new File(name);
+			if (comicFile.exists()) {
+				File backup = new File(targetDir.getAbsolutePath() + File.separator + "backup-" +
+						sdf.format(new Date())
+						+ "-comic.xml");
+				Files.move(comicFile, backup);
+			}
+			comicFile.createNewFile();
+			XmlMarshaller.startMarshallOf(Comic.class)
+					.useFormattedOutput()
+					.to(new FileOutputStream(name))
+					.of(comic);
+		} catch (JAXBException | IOException e1) {
+			e1.printStackTrace();
+		}
+	}
 
-    @Override
-    public void handleDirSelectedEvent(DirSelectedEvent event) {
-        this.comic = event.getModel();
-        this.targetDir = event.getSelectedDir();
-    }
+	@Override
+	public void handleDirSelectedEvent(DirSelectedEvent event) {
+		this.comic = event.getModel();
+		this.targetDir = event.getSelectedDir();
+	}
 }
