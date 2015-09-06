@@ -1,10 +1,10 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
-import org.fest.assertions.Delta;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.data.Offset.offset;
 
 /**
  * TODO write JAVADOC!!!
@@ -66,10 +66,10 @@ public class FrameTest {
 	@Test
 	public void testSetRelativeArea() throws Exception {
 		frame.setRelativeArea("0.10 0.20 0.30 0.40");
-		assertThat(frame.getStartX()).isEqualTo(0.1, Delta.delta(0.01));
-		assertThat(frame.getStartY()).isEqualTo(0.2, Delta.delta(0.01));
-		assertThat(frame.getSizeX()).isEqualTo(0.3, Delta.delta(0.01));
-		assertThat(frame.getSizeY()).isEqualTo(0.4, Delta.delta(0.01));
+		assertThat(frame.getStartX()).isEqualTo(0.1, offset(0.01));
+		assertThat(frame.getStartY()).isEqualTo(0.2, offset(0.01));
+		assertThat(frame.getSizeX()).isEqualTo(0.3, offset(0.01));
+		assertThat(frame.getSizeY()).isEqualTo(0.4, offset(0.01));
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

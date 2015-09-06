@@ -11,19 +11,25 @@ import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEvent;
 import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEventListener;
+import pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEvent;
+import pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import static pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEvent.Direction.UP;
 
 /**
- * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener, RemoveFrameEventListener, DirSelectedEventListener {
+public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener,
+		RemoveFrameEventListener, DirSelectedEventListener, SwitchFrameEventListener {
 
 	private final GridBagConstraints gbc;
+
 	private Screen selectedScreen;
 
 	public FramesPanel() {
@@ -46,15 +52,15 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener, A
 		gbc.gridx = 0;
 		gbc.gridy = gbc.gridy + 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		add(new FramePanel(frame), gbc);
+		FramePanel framePanel = new FramePanel(frame, frame.getId() == selectedScreen.getScreenSize() - 1);
+		add(framePanel, gbc);
 	}
-
 
 	@Override
 	@Subscribe
-	public void handelAddFrameEvent(AddFrameEvent event) {
+	public void handleAddFrameEvent(AddFrameEvent event) {
 		selectedScreen = event.screen;
-		Frame frame = new Frame(selectedScreen.getFrames().size());
+		Frame frame = new Frame(selectedScreen.getScreenSize());
 		frame.setStartX(event.frameRect.startX);
 		frame.setStartY(event.frameRect.startY);
 		frame.setSizeX(event.frameRect.width);
@@ -77,6 +83,22 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener, A
 	@Override
 	public void handleDirSelectedEvent(DirSelectedEvent event) {
 		removeAll();
+	}
+
+	@Override
+	@Subscribe
+	public void handelSwitchFrameEvent(SwitchFrameEvent event) {
+		int currentId = event.frame.getId();
+		if (event.direction == UP) {
+			if (currentId == 0) return;
+			selectedScreen.moveFrameUp(event.frame);
+			App.EVENT_BUS.post(new ImageSelectedEvent(null, selectedScreen));
+		} else {
+			if (currentId == selectedScreen.getScreenSize()) return;
+			selectedScreen.moveFrameDown(event.frame);
+			App.EVENT_BUS.post(new ImageSelectedEvent(null, selectedScreen));
+		}
+
 	}
 }
 

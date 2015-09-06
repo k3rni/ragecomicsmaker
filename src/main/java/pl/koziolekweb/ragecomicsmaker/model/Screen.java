@@ -15,9 +15,6 @@ import static com.google.common.collect.ComparisonChain.start;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-
-//@XmlRootElement
-//@XmlAccessorType(XmlAccessType.FIELD)
 public class Screen implements Serializable, Comparable<Screen> {
 
 	@XmlAttribute(required = true)
@@ -101,4 +98,23 @@ public class Screen implements Serializable, Comparable<Screen> {
 		frames = newFrames;
 	}
 
+	public void moveFrameUp(Frame frame) {
+		int id = frame.getId();
+		Frame weGoHere = frames.stream().filter(f -> f.getId() == id - 1).findFirst().get();
+		frame.setId(id - 1);
+		weGoHere.setId(id);
+		frames = frames.stream().collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
+	}
+
+	public void moveFrameDown(Frame frame) {
+		int id = frame.getId();
+		Frame weGoHere = frames.stream().filter(f -> f.getId() == id + 1).findFirst().get();
+		frame.setId(id + 1);
+		weGoHere.setId(id);
+		frames = frames.stream().collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
+	}
+
+	public int getScreenSize() {
+		return getFrames().size();
+	}
 }

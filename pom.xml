@@ -66,7 +66,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>18.0</version>
         </dependency>
         <dependency>
             <groupId>com.twelvemonkeys.imageio</groupId>
@@ -81,8 +81,8 @@
         </dependency>
         <dependency>
             <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert</artifactId>
-            <version>1.4</version>
+            <artifactId>fest-assert-core</artifactId>
+            <version>2.0M10</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -6,5 +6,5 @@ package pl.koziolekweb.ragecomicsmaker.event;
  */
 public interface AddFrameEventListener {
 
-	public void handelAddFrameEvent(AddFrameEvent event);
+	public void handleAddFrameEvent(AddFrameEvent event);
 }

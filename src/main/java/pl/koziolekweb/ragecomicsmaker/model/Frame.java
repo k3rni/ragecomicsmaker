@@ -43,7 +43,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 	@XmlTransient
 	private boolean visibility = true;
 
-
 	public Frame() {
 		//
 	}

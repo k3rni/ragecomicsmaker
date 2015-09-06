@@ -67,7 +67,7 @@ public class App implements Runnable, ErrorEventListener {
 		springLayout.putConstraint(SpringLayout.NORTH, framesPanel, 5, SpringLayout.NORTH, mainPanel);
 		springLayout.putConstraint(SpringLayout.SOUTH, framesPanel, -5, SpringLayout.SOUTH, mainPanel);
 		springLayout.putConstraint(SpringLayout.WEST, framesPanel, 5, SpringLayout.EAST, imagePanel);
-		springLayout.putConstraint(SpringLayout.WEST, framesPanel, -250, SpringLayout.EAST, mainPanel);
+		springLayout.putConstraint(SpringLayout.WEST, framesPanel, -350, SpringLayout.EAST, mainPanel);
 		springLayout.putConstraint(SpringLayout.EAST, framesPanel, 5, SpringLayout.EAST, mainPanel);
 
 	}

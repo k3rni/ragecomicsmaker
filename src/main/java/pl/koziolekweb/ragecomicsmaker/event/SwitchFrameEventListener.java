@@ -4,7 +4,7 @@ package pl.koziolekweb.ragecomicsmaker.event;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public interface RemoveFrameEventListener {
+public interface SwitchFrameEventListener {
 
-	void handleRemoveFrameEvent(RemoveFrameEvent event);
+	void handelSwitchFrameEvent(SwitchFrameEvent event);
 }

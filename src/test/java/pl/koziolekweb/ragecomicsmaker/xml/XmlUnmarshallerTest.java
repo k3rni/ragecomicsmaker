@@ -6,7 +6,7 @@ import pl.koziolekweb.ragecomicsmaker.model.Comic;
 
 import java.io.File;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * TODO write JAVADOC!!!
@@ -23,7 +23,7 @@ public class XmlUnmarshallerTest {
 	}
 
 	@Test
-	public void testUnmarhalling() throws Exception {
+	public void testUnmarshalling() throws Exception {
 		Comic from = (Comic) XmlUnmarshaller.startUnmarshallOf(Comic.class).from(file);
 		assertThat(from).isNotNull();
 		assertThat(from.getScreens()).hasSize(50);
