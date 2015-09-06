@@ -28,3 +28,4 @@ gwt-unitCache/
 
 # project ignores 
 src/test/resources/sample/
+src/test/resources/sample2/

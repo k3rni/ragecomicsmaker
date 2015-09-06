@@ -16,8 +16,10 @@ import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -65,6 +67,10 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 					paintNewFrame = false;
 					endX = e.getX();
 					endY = e.getY();
+					if(!inImage(startX, startY) || !inImage(endX, endY)){
+						repaint();
+						return;
+					}
 					try {
 						AddFrameEvent addFrameEvent = new AddFrameEvent(fsc.buildFrameRec(
 								Math.min(startX, endX), Math.min(startY, endY),
@@ -96,7 +102,15 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 		BufferedImage off = new BufferedImage(getWidth(), getHeight(), TYPE_4BYTE_ABGR);
 		Graphics buffer = off.getGraphics();
 		if (image != null) {
-			scaledInstance = image.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+			int targetWidth = getWidth();
+			int targetHeight = getWidth();
+			double proportion = countProportion(image);
+			if (proportion > 1.0) {
+				targetHeight *= 1 / proportion;
+			} else {
+				targetWidth *= 1 / proportion;
+			}
+			scaledInstance = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
 			buffer.drawImage(scaledInstance, 0, 0, null);
 			if (paintNewFrame) {
 				rdm.setColor(new Color(200, 200, 200, 200));
@@ -124,6 +138,10 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 		}
 		graphics.drawImage(off, 0, 0, null);
 		buffer.dispose();
+	}
+
+	private double countProportion(BufferedImage image) {
+		return image.getWidth() / (double) image.getHeight();
 	}
 
 	@Override
@@ -155,5 +173,10 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 	@Override
 	public void handelFrameStateChangeEvent(FrameStateChangeEvent event) {
 		repaint();
+	}
+
+	private boolean inImage(int posX, int posY) {
+		return posX > 0 && posX <= scaledInstance.getWidth(null)
+				&& posY >0 && posY <= scaledInstance.getHeight(null);
 	}
 }
