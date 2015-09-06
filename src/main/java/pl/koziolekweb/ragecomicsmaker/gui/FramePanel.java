@@ -31,7 +31,6 @@ public class FramePanel extends JPanel {
 		gbc.gridy = 0;
 		add(new JLabel(this.frame.getId() + "."), gbc);
 
-
 		final JCheckBox visibility = new JCheckBox((String) null, frame.isVisible());
 		visibility.addItemListener(new ItemListener() {
 			@Override
@@ -53,7 +52,15 @@ public class FramePanel extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = ++i;
 		gbc.gridy = 0;
-		add(new Label(this.frame.getRelativeArea()), gbc);
+		Label comp = new Label(this.frame.getRelativeArea());
+		comp.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+					new FrameEditorFrame(FramePanel.this.frame);
+			}
+		});
+		add(comp, gbc);
 
 		removeBtn = new JButton("X");
 		removeBtn.setSize(25, 25);

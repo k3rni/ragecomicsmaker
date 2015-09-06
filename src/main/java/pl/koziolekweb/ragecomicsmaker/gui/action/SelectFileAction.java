@@ -28,6 +28,7 @@ public class SelectFileAction extends MouseAdapter {
 		jfc.setMultiSelectionEnabled(false);
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		jfc.showOpenDialog(parent);
+		jfc.setCurrentDirectory(new File("/home/koziolek/workspace/ragecomicsmaker/src/test/resources/sample"));
 		File selectedFile = jfc.getSelectedFile();
 		App.EVENT_BUS.post(new DirSelectedEvent(selectedFile));
 	}

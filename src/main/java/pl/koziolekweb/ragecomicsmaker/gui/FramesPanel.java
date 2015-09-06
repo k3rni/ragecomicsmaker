@@ -38,9 +38,7 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener, A
 		removeAll();
 		gbc.gridy = 0;
 		selectedScreen = event.selectedScreen;
-		for (Frame frame : selectedScreen.getFrames()) {
-			addFrame(frame);
-		}
+		selectedScreen.getFrames().forEach(this::addFrame);
 		updateUI();
 	}
 

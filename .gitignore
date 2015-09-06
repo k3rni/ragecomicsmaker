@@ -25,3 +25,6 @@ test-output/
 out/
 .idea/
 gwt-unitCache/
+
+# project ignores 
+src/test/resources/sample/
