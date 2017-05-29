@@ -16,9 +16,8 @@ import pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
-import javax.swing.JPanel;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import javax.swing.*;
+import java.awt.*;
 
 import static pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEvent.Direction.UP;
 

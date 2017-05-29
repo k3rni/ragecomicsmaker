@@ -6,13 +6,8 @@ import pl.koziolekweb.ragecomicsmaker.event.RemoveFrameEvent;
 import pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEvent;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Label;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -27,7 +22,7 @@ public class FramePanel extends JPanel {
 	private final JButton removeBtn;
 	private boolean isLast;
 
-	public FramePanel(final Frame frame){
+	public FramePanel(final Frame frame) {
 		this(frame, false);
 	}
 

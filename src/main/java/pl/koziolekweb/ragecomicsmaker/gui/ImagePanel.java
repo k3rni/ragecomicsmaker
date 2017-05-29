@@ -16,10 +16,8 @@ import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -67,7 +65,7 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 					paintNewFrame = false;
 					endX = e.getX();
 					endY = e.getY();
-					if(!inImage(startX, startY) || !inImage(endX, endY)){
+					if (!inImage(startX, startY) || !inImage(endX, endY)) {
 						repaint();
 						return;
 					}
@@ -177,6 +175,6 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 
 	private boolean inImage(int posX, int posY) {
 		return posX > 0 && posX <= scaledInstance.getWidth(null)
-				&& posY >0 && posY <= scaledInstance.getHeight(null);
+				&& posY > 0 && posY <= scaledInstance.getHeight(null);
 	}
 }

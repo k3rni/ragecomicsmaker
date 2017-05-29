@@ -11,10 +11,10 @@ public class SwitchFrameEvent {
 	public final Frame frame;
 	public final Direction direction;
 
-	public enum Direction {UP, DOWN}
-
 	public SwitchFrameEvent(Frame frame, Direction direction) {
 		this.frame = frame;
 		this.direction = direction;
 	}
+
+	public enum Direction {UP, DOWN}
 }
