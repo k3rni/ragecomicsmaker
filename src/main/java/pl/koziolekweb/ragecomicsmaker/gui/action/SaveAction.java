@@ -56,32 +56,41 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 					.to(new FileOutputStream(name))
 					.of(comic);
 			// Iterate over all images in comic and their crops. Use ImageIO to produce tiny cropped files
-			for (Screen screen : comic.getScreens()) {
-				// The screens only keep reference to their file, so we need to load its image first
-				if (screen.getFrames().size() == 0) continue;
-				if (screen.getImage() == null) continue;
-
-				BufferedImage image = ImageIO.read(screen.getImage());
-				for (Frame frame : screen.getFrames()) {
-					String frameFilename = String.format("%1$03d_%2$03d.png", screen.getIndex(), frame.getId());
-					Path path = FileSystems.getDefault().getPath(targetDir.getAbsolutePath(), "clips", frameFilename);
-
-					double x = frame.getStartX() * image.getWidth();
-					double w = frame.getSizeX() * image.getWidth();
-					double y = frame.getStartY() * image.getHeight();
-					double h = frame.getSizeY() * image.getHeight();
-
-					BufferedImage clip = image.getSubimage((int) Math.round(x),
-							(int) Math.round(y),
-							(int) Math.round(w),
-							(int) Math.round(h));
-					Files.createParentDirs(path.toFile());
-					ImageIO.write(clip, "png", path.toFile());
-				}
-			}
+			saveSubImages();
 		} catch (JAXBException | IOException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	private void saveSubImages() throws IOException {
+		for (Screen screen : comic.getScreens()) {
+			// The screens only keep reference to their file, so we need to load its image first
+			if (screen.getFrames().size() == 0) continue;
+			if (screen.getImage() == null) continue;
+
+			BufferedImage image = ImageIO.read(screen.getImage());
+			for (Frame frame : screen.getFrames()) {
+				String frameFilename = String.format("%1$03d_%2$03d.png", screen.getIndex(), frame.getId());
+				Path path = FileSystems.getDefault().getPath(targetDir.getAbsolutePath(), "clips", frameFilename);
+
+				BufferedImage clip = getSubImage(image, frame);
+				Files.createParentDirs(path.toFile());
+				ImageIO.write(clip, "png", path.toFile());
+			}
+		}
+	}
+
+	private BufferedImage getSubImage(BufferedImage image, Frame frame) {
+		double x = frame.getStartX() * image.getWidth();
+		double w = frame.getSizeX() * image.getWidth();
+		double y = frame.getStartY() * image.getHeight();
+		double h = frame.getSizeY() * image.getHeight();
+
+		BufferedImage clip = image.getSubimage((int) Math.round(x),
+				(int) Math.round(y),
+				(int) Math.round(w),
+				(int) Math.round(h));
+		return clip;
 	}
 
 	@Override
