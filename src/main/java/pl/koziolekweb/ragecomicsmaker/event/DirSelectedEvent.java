@@ -1,5 +1,7 @@
 package pl.koziolekweb.ragecomicsmaker.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import pl.koziolekweb.ragecomicsmaker.App;
@@ -11,6 +13,7 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -62,29 +65,22 @@ public class DirSelectedEvent {
 			}
 		});
 		if (comicFileName.length == 1) {
+			ObjectMapper mapper = new XmlMapper();
 			try {
-				final Comic from = (Comic) (XmlUnmarshaller.startUnmarshallOf(Comic.class).from(comicFileName[0]));
+				final Comic from = mapper.readValue(comicFileName[0], Comic.class);
 				List<File> images = getImages(from.getImages().getNamePattern());
-				Collections.sort(images);
+				Collections.sort(images);;
 				if (images.size() != from.getScreens().size()) {
 					App.EVENT_BUS.post(new ErrorEvent("Liczba obarazów inna niż zadeklarowana w pliku!", null));
 //					return from;
 				}
-				Collections2.filter(images, new Predicate<File>() {
-					@Override
-					public boolean apply(File input) {
-						String number = input.getName().replaceAll("\\D", "");
-						Screen screenByIndex = from.findScreenByIndex(number);
-						screenByIndex.setIndex(Integer.parseInt(number));
-						screenByIndex.setImage(input);
-						return true;
-					}
-				}).size();
+//				renumberScreens(from, images);
 				return from;
-			} catch (JAXBException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+
 		Comic comic = new Comic();
 		comic.initDefaults();
 		List<File> images = getImages(null);
@@ -99,5 +95,15 @@ public class DirSelectedEvent {
 			i++;
 		}
 		return comic;
+	}
+
+	private void renumberScreens(Comic from, List<File> images) {
+		Collections2.filter(images, input -> {
+			String number = input.getName().replaceAll("\\D", "");
+			Screen screenByIndex = from.findScreenByIndex(number);
+			screenByIndex.setIndex(Integer.parseInt(number));
+			screenByIndex.setImage(input);
+			return true;
+		}).size();
 	}
 }

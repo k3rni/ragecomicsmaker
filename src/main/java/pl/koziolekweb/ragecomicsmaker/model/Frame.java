@@ -1,7 +1,5 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -9,38 +7,43 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.ComparisonChain.start;
 import static java.util.Arrays.asList;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 /**
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-public class Frame implements Serializable, Comparable<Frame> {
-
-	@XmlAttribute(required = true)
+@JacksonXmlRootElement(localName = "frame")
+public class Frame implements Comparable<Frame> {
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true)
 	private String relativeArea;
-
-	@XmlAttribute(required = true)
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true)
 	private double transitionDuration;
-
-	@XmlTransient
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true)
 	private double startX;
-
-	@XmlTransient
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true)
 	private double startY;
-
-	@XmlTransient
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true)
 	private double sizeX;
-
-	@XmlTransient
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true)
 	private double sizeY;
-
-	@XmlTransient
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true)
 	private int id;
 
 	/**
-	 * Frame is visible by default. This field is @XmlTransient and will be ignored by JAXB (un)marshaller.
+	 * Frame is visible by default. This field is @JsonIgnore and will be ignored by JAXB (un)marshaller.
 	 */
-	@XmlTransient
+	@JsonIgnore
 	private boolean visibility = true;
 
 	public Frame() {
@@ -61,7 +64,7 @@ public class Frame implements Serializable, Comparable<Frame> {
 		this.id = newId;
 	}
 
-	@XmlTransient
+	@JsonIgnore
 	public boolean isVisible() {
 		return visibility;
 	}
@@ -74,7 +77,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 		this.visibility = false;
 	}
 
-	@XmlTransient
 	public String getRelativeArea() {
 		return relativeArea;
 	}
@@ -85,7 +87,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 		recountValues();
 	}
 
-	@XmlTransient
 	public double getTransitionDuration() {
 		return transitionDuration;
 	}
@@ -94,7 +95,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 		this.transitionDuration = transitionDuration;
 	}
 
-	@XmlTransient
 	public double getStartX() {
 		recountValues();
 		return startX;
@@ -106,7 +106,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 		recountRelativeArea();
 	}
 
-	@XmlTransient
 	public double getStartY() {
 		recountValues();
 		return startY;
@@ -118,7 +117,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 		recountRelativeArea();
 	}
 
-	@XmlTransient
 	public double getSizeX() {
 		recountValues();
 		return sizeX;
@@ -130,7 +128,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 		recountRelativeArea();
 	}
 
-	@XmlTransient
 	public double getSizeY() {
 		recountValues();
 		return sizeY;
@@ -142,7 +139,6 @@ public class Frame implements Serializable, Comparable<Frame> {
 		recountRelativeArea();
 	}
 
-	@XmlTransient
 	public int getId() {
 		return id;
 	}

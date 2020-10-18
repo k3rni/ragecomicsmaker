@@ -1,10 +1,12 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
@@ -17,24 +19,24 @@ import static com.google.common.collect.ComparisonChain.start;
  */
 public class Screen implements Serializable, Comparable<Screen> {
 
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private int index;
 
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private String bgcolor;
 
-	@XmlElement(name = "frame")
+	@JacksonXmlElementWrapper(localName = "frames")
+	@JsonProperty(value = "frame")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private Collection<Frame> frames;
 
 	// a teraz drogie dzieci nie xmlowa część modelu tzw. core
-	@XmlTransient
 	private File image;
 
 	public Screen() {
 		frames = new ArrayList<>();
 	}
 
-	@XmlTransient
 	public File getImage() {
 		return image;
 	}
@@ -47,7 +49,6 @@ public class Screen implements Serializable, Comparable<Screen> {
 		frames.add(frame);
 	}
 
-	@XmlTransient
 	public int getIndex() {
 		return index;
 	}
@@ -56,7 +57,6 @@ public class Screen implements Serializable, Comparable<Screen> {
 		this.index = index;
 	}
 
-	@XmlTransient
 	public String getBgcolor() {
 		return bgcolor;
 	}
@@ -114,6 +114,7 @@ public class Screen implements Serializable, Comparable<Screen> {
 		frames = frames.stream().collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
 	}
 
+	@JsonIgnore
 	public int getScreenSize() {
 		return getFrames().size();
 	}

@@ -1,5 +1,7 @@
 package pl.koziolekweb.ragecomicsmaker;
 
+
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
@@ -20,6 +22,7 @@ public class App implements Runnable, ErrorEventListener {
 	private JFrame main;
 
 	public static void main(String[] args) {
+		FlatDarkLaf.install();
 		SwingUtilities.invokeLater(new App());
 	}
 

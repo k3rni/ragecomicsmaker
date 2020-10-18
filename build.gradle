@@ -10,16 +10,17 @@ plugins {
 
 repositories {
     mavenLocal()
+    jcenter()
     maven {
-        url = uri('http://repo.maven.apache.org/maven2')
+        url = uri('https://repo.maven.apache.org/maven2')
     }
 }
 
 dependencies {
-    // Mvn had no issue with this
-    // implementation 'com.liferay:jaxb-api:2.3.0.LIFERAY-PATCHED-1'
-    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-    implementation 'com.sun.xml.bind:jaxb-impl:2.2.5-b10'
+    implementation 'com.positiondev.epublib:epublib-core:3.1'
+    implementation 'com.formdev:flatlaf:0.43'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.1'
+    implementation 'com.fasterxml.woodstox:woodstox-core:5.1.0'
     implementation 'com.google.guava:guava:18.0'
     implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.0-rc5'
     testImplementation 'org.testng:testng:6.8.8'
@@ -31,14 +32,6 @@ group = 'pl.koziolekweb.ragecomicsmaker'
 version = '1.1.0-SNAPSHOT'
 description = 'ragecomicsmaker'
 sourceCompatibility = '1.8'
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

@@ -1,5 +1,7 @@
 package pl.koziolekweb.ragecomicsmaker.gui.action;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.io.Files;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
@@ -51,13 +53,12 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 				Files.move(comicFile, backup);
 			}
 			comicFile.createNewFile();
-			XmlMarshaller.startMarshallOf(Comic.class)
-					.useFormattedOutput()
-					.to(new FileOutputStream(name))
-					.of(comic);
+			XmlMapper mapper = new XmlMapper();
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);
+			mapper.writeValue(new FileOutputStream(name), comic);
 			// Iterate over all images in comic and their crops. Use ImageIO to produce tiny cropped files
 			saveSubImages();
-		} catch (JAXBException | IOException e1) {
+		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 	}

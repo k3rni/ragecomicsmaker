@@ -1,7 +1,13 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import nl.siegmann.epublib.domain.Author;
+import nl.siegmann.epublib.domain.Date;
+import nl.siegmann.epublib.domain.Metadata;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.xml.DirectionAdapter;
@@ -25,28 +31,30 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @XmlRootElement(name = "comic")
 public class Comic implements Serializable {
-
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private int version;
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private String id;
-	@XmlAttribute(required = true)
+
 	private String title;
-	@XmlAttribute(required = true)
-	@XmlJavaTypeAdapter(DirectionAdapter.class)
+
+	@JacksonXmlProperty(isAttribute = true)
 	private Direction direction;
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private String orientation;
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private String transition;
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private String bgcolor;
 
-	@XmlElement
 	private Images images;
 
-	@XmlElement(name = "screen")
+	@JacksonXmlElementWrapper(localName = "screens")
+	@JsonProperty(value = "screen") // Applies to elements of this set
 	private TreeSet<Screen> screens = new TreeSet<Screen>();
+
+	@JsonProperty
+	private Metadata metadata;
 
 	public Comic() {
 		initDefaults();
@@ -66,6 +74,7 @@ public class Comic implements Serializable {
 		this.transition = "";
 		this.bgcolor = "#FFFFFF";
 		this.images = new Images().initDefaults();
+		this.metadata = new Metadata();
 		return this;
 	}
 
@@ -74,7 +83,6 @@ public class Comic implements Serializable {
 		images.setLength(screens.size());
 	}
 
-	@XmlTransient
 	public Images getImages() {
 		return images;
 	}
@@ -83,7 +91,6 @@ public class Comic implements Serializable {
 		this.images = images;
 	}
 
-	@XmlTransient
 	public TreeSet<Screen> getScreens() {
 		return screens;
 	}
@@ -92,7 +99,6 @@ public class Comic implements Serializable {
 		this.screens = screens;
 	}
 
-	@XmlTransient
 	public int getVersion() {
 		return version;
 	}
@@ -101,7 +107,6 @@ public class Comic implements Serializable {
 		this.version = version;
 	}
 
-	@XmlTransient
 	public String getId() {
 		return id;
 	}
@@ -110,7 +115,6 @@ public class Comic implements Serializable {
 		this.id = id;
 	}
 
-	@XmlTransient
 	public String getTitle() {
 		return title;
 	}
@@ -119,7 +123,6 @@ public class Comic implements Serializable {
 		this.title = title;
 	}
 
-	@XmlTransient
 	public Direction getDirection() {
 		return direction;
 	}
@@ -128,7 +131,6 @@ public class Comic implements Serializable {
 		this.direction = direction;
 	}
 
-	@XmlTransient
 	public String getOrientation() {
 		return orientation;
 	}
@@ -137,7 +139,6 @@ public class Comic implements Serializable {
 		this.orientation = orientation;
 	}
 
-	@XmlTransient
 	public String getTransition() {
 		return transition;
 	}
@@ -146,7 +147,6 @@ public class Comic implements Serializable {
 		this.transition = transition;
 	}
 
-	@XmlTransient
 	public String getBgcolor() {
 		return bgcolor;
 	}
@@ -172,13 +172,7 @@ public class Comic implements Serializable {
 	public Screen findScreenByIndex(String number) {
 		try {
 			final int intNumber = Integer.parseInt(number);
-			Collection<Screen> filtered = Collections2.filter(screens, new Predicate<Screen>() {
-				@Override
-				public boolean apply(Screen input) {
-
-					return input.getIndex() == intNumber;
-				}
-			});
+			Collection<Screen> filtered = Collections2.filter(screens, input -> input.getIndex() == intNumber);
 			if (filtered.iterator().hasNext())
 				return filtered.iterator().next();
 			return new Screen(); // tak naprawdę do niczego nie podpiety null object

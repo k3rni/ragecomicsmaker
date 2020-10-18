@@ -1,5 +1,8 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
@@ -9,14 +12,13 @@ import java.io.Serializable;
  * User: koziolek
  */
 public class Images implements Serializable {
-
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private int length;
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private int startAt;
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private String indexPattern;
-	@XmlAttribute(required = true)
+	@JacksonXmlProperty(isAttribute = true)
 	private String namePattern;
 
 	public Images() {
@@ -24,38 +26,30 @@ public class Images implements Serializable {
 	}
 
 
-	@XmlTransient
 	public int getLength() {
 		return length;
 	}
-
 	public void setLength(int length) {
 		this.length = length;
 	}
 
-	@XmlTransient
 	public int getStartAt() {
 		return startAt;
 	}
-
 	public void setStartAt(int startAt) {
 		this.startAt = startAt;
 	}
 
-	@XmlTransient
 	public String getIndexPattern() {
 		return indexPattern;
 	}
-
 	public void setIndexPattern(String indexPattern) {
 		this.indexPattern = indexPattern;
 	}
 
-	@XmlTransient
 	public String getNamePattern() {
 		return namePattern;
 	}
-
 	public void setNamePattern(String namePattern) {
 		this.namePattern = namePattern;
 	}
