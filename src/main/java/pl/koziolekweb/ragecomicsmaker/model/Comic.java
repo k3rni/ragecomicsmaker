@@ -3,20 +3,12 @@ package pl.koziolekweb.ragecomicsmaker.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import nl.siegmann.epublib.domain.Author;
-import nl.siegmann.epublib.domain.Date;
-import nl.siegmann.epublib.domain.Metadata;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
-import pl.koziolekweb.ragecomicsmaker.xml.DirectionAdapter;
+import pl.koziolekweb.ragecomicsmaker.event.MetadataUpdateEvent;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
@@ -36,7 +28,7 @@ public class Comic implements Serializable {
 	@JacksonXmlProperty(isAttribute = true)
 	private String id;
 
-	private String title;
+	public String title;
 
 	@JacksonXmlProperty(isAttribute = true)
 	private Direction direction;
@@ -54,7 +46,19 @@ public class Comic implements Serializable {
 	private TreeSet<Screen> screens = new TreeSet<Screen>();
 
 	@JsonProperty
-	private Metadata metadata;
+	public String description;
+	@JsonProperty
+	public String author;
+	@JsonProperty
+	public String illustrator;
+	@JsonProperty
+	public String publisher;
+	@JsonProperty
+	public String publicationDate;
+	@JsonProperty
+	public String isbn;
+	@JsonProperty
+	public String rights;
 
 	public Comic() {
 		initDefaults();
@@ -74,7 +78,6 @@ public class Comic implements Serializable {
 		this.transition = "";
 		this.bgcolor = "#FFFFFF";
 		this.images = new Images().initDefaults();
-		this.metadata = new Metadata();
 		return this;
 	}
 
@@ -157,13 +160,11 @@ public class Comic implements Serializable {
 
 	public Screen findScreenByFileName(final String lastSelectedPathComponent) {
 		checkNotNull(lastSelectedPathComponent);
-		Collection<Screen> filtered = Collections2.filter(screens, new Predicate<Screen>() {
-			@Override
-			public boolean apply(Screen input) {
-				File image = input.getImage();
-				if (image == null) return false;
-				return lastSelectedPathComponent.equals(image.getName());
-			}
+		String filename = lastSelectedPathComponent.split(" ", 2)[0];
+		Collection<Screen> filtered = Collections2.filter(screens, input -> {
+			File image = input.getImage();
+			if (image == null) return false;
+			return filename.equals(image.getName());
 		});
 		checkState(filtered.size() == 1);
 		return filtered.iterator().next();
@@ -180,5 +181,16 @@ public class Comic implements Serializable {
 			App.EVENT_BUS.post(new ErrorEvent("Nieoczekiwany błąd odczytu - nieprawidłowy numer pliku " + number, e));
 			return new Screen();
 		}
+	}
+
+	public void updateMetadata(MetadataUpdateEvent event) {
+		this.title = event.title;
+		this.description = event.descr;
+		this.author = event.authors;
+		this.illustrator = event.illustrators;
+		this.publisher = event.publisher;
+		this.publicationDate = event.pubDate;
+		this.isbn = event.isbn;
+		this.rights = event.rights;
 	}
 }

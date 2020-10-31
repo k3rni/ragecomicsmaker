@@ -1,9 +1,13 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
+import com.google.common.eventbus.Subscribe;
+//import com.jgoodies.forms.builder.FormBuilder;
+//import com.jgoodies.forms.builder.ListViewBuilder;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
+import pl.koziolekweb.ragecomicsmaker.event.MetadataUpdateEvent;
 import pl.koziolekweb.ragecomicsmaker.gui.action.EditMetaAction;
 import pl.koziolekweb.ragecomicsmaker.gui.action.SaveAction;
 import pl.koziolekweb.ragecomicsmaker.gui.action.SelectFileAction;
@@ -47,7 +51,7 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 		layout.setConstraints(openDirBtn, c);
 		add(openDirBtn);
 
-		Component files = prepareFileTree();
+		JScrollPane files = prepareFileTree();
 		c.gridy = 3;
 		c.gridheight = 14;
 		c.weighty = 1;
@@ -64,20 +68,19 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 		add(saveBtn);
 
 		JButton metaBtn = new JButton("Metadata");
-		metaBtn.setEnabled(false);
 		c.gridx = 10;
 		c.anchor = GridBagConstraints.SOUTHEAST;
 		layout.setConstraints(metaBtn, c);
 		add(metaBtn);
-
 
 		openDirBtn.addMouseListener(new SelectFileAction(this));
 		SaveAction saveAction = new SaveAction();
 		App.EVENT_BUS.register(saveAction);
 		saveBtn.addMouseListener(saveAction);
 
-		metaBtn.addMouseListener(new EditMetaAction());
-
+		EditMetaAction metaAction = new EditMetaAction();
+		App.EVENT_BUS.register(metaAction);
+		metaBtn.addActionListener(metaAction);
 	}
 
 	public void handleDirSelectedEvent(DirSelectedEvent event) {
@@ -89,7 +92,8 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 		for (Screen image : images) {
 			File image1 = image.getImage();
 			if (image1 != null) {
-				DefaultMutableTreeNode child = new DefaultMutableTreeNode(image1.getName());
+				String label = String.format("%s [%d]", image1.getName(), image.getFrames().size());
+				DefaultMutableTreeNode child = new DefaultMutableTreeNode(label);
 				root.add(child);
 			}
 		}
@@ -113,5 +117,11 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 			Screen selectedScreen = comic.findScreenByFileName(newLeadSelectionPath.getLastPathComponent().toString());
 			App.EVENT_BUS.post(new ImageSelectedEvent(comic, selectedScreen));
 		}
+	}
+
+	@Subscribe
+	public void handleMetadataUpdated(MetadataUpdateEvent event) {
+		if (comic == null) return;
+		comic.updateMetadata(event);
 	}
 }
