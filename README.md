@@ -26,7 +26,7 @@ Clicking "Build" will do the following:
 1. Generate frames as separate images in a `clips/` subdirectory. These are always PNG files for now.
 2. Try to find a `page.xhtml` file in the images directory. This is a mustache-style template of a HTML file
 to be used as each page of the resulting comic. Currently, the variables available to that template
-are only `{{title}}` (as set in metadata) and `{{href}}`, containing the current page, or subframe's image path.
+are only `{{title}}` (as set in metadata) and `{{image}}`, containing the current page, or subframe's image path.
 If not found in the images directory, a simple default will be used.
 3. Produce `book.epub`  in the selected directory. Pages are generated from the source images,
 each followed by its subframes. There is one page for each image, containing the full image,
