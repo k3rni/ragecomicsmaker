@@ -51,7 +51,8 @@ public class ComicCompiler {
         }
 
         EpubWriter epubWriter = new EpubWriter();
-        epubWriter.write(book, new FileOutputStream("book.epub"));
+        Path out = targetDir.toPath().resolve("book.epub");
+        epubWriter.write(book, new FileOutputStream(out.toFile()));
     }
 
     private Reader buildPage(Screen screen, Frame frame, Mustache template) {
