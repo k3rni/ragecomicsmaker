@@ -2,14 +2,11 @@ package pl.koziolekweb.ragecomicsmaker.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
-import pl.koziolekweb.ragecomicsmaker.xml.XmlUnmarshaller;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
