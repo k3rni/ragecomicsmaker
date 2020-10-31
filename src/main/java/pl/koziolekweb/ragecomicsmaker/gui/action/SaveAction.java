@@ -2,31 +2,32 @@ package pl.koziolekweb.ragecomicsmaker.gui.action;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 import com.google.common.io.Files;
+import nl.siegmann.epublib.domain.*;
+import nl.siegmann.epublib.epub.EpubWriter;
+import org.apache.commons.io.FilenameUtils;
+import pl.koziolekweb.ragecomicsmaker.ComicCompiler;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
-import pl.koziolekweb.ragecomicsmaker.xml.XmlMarshaller;
 
 import javax.imageio.ImageIO;
-import javax.xml.bind.JAXBException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.FileSystem;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.time.temporal.TemporalAccessor;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * TODO write JAVADOC!!!
@@ -58,10 +59,13 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 			mapper.writeValue(new FileOutputStream(name), comic);
 			// Iterate over all images in comic and their crops. Use ImageIO to produce tiny cropped files
 			saveSubImages();
+			new ComicCompiler(targetDir, comic).save();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 	}
+
+
 
 	private void saveSubImages() throws IOException {
 		for (Screen screen : comic.getScreens()) {
@@ -71,14 +75,22 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 
 			BufferedImage image = ImageIO.read(screen.getImage());
 			for (Frame frame : screen.getFrames()) {
-				String frameFilename = String.format("%1$03d_%2$03d.png", screen.getIndex(), frame.getId());
-				Path path = FileSystems.getDefault().getPath(targetDir.getAbsolutePath(), "clips", frameFilename);
+				String frameFilename = frameFilename(screen, frame);
+				Path path = clipPath(frameFilename);
 
 				BufferedImage clip = getSubImage(image, frame);
 				Files.createParentDirs(path.toFile());
 				ImageIO.write(clip, "png", path.toFile());
 			}
 		}
+	}
+
+	private Path clipPath(String frameFilename) {
+		return FileSystems.getDefault().getPath(targetDir.getAbsolutePath(), "clips", frameFilename);
+	}
+
+	private String frameFilename(Screen screen, Frame frame) {
+		return String.format("%1$03d_%2$03d.png", screen.getIndex(), frame.getId());
 	}
 
 	private BufferedImage getSubImage(BufferedImage image, Frame frame) {
