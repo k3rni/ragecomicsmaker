@@ -17,6 +17,7 @@ import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -60,6 +61,8 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 			// Iterate over all images in comic and their crops. Use ImageIO to produce tiny cropped files
 			saveSubImages();
 			new ComicCompiler(targetDir, comic).save();
+			JOptionPane.showMessageDialog(null,
+					String.format("Saved comic into %s as book.epub", targetDir.getCanonicalPath()));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
