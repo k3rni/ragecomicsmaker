@@ -24,17 +24,13 @@ public class Frame implements Comparable<Frame> {
 	@JsonProperty
 	@JacksonXmlProperty(isAttribute = true)
 	private double transitionDuration;
-	@JsonProperty
-	@JacksonXmlProperty(isAttribute = true)
+	@JsonIgnore
 	private double startX;
-	@JsonProperty
-	@JacksonXmlProperty(isAttribute = true)
+	@JsonIgnore
 	private double startY;
-	@JsonProperty
-	@JacksonXmlProperty(isAttribute = true)
+	@JsonIgnore
 	private double sizeX;
-	@JsonProperty
-	@JacksonXmlProperty(isAttribute = true)
+	@JsonIgnore
 	private double sizeY;
 	@JsonProperty
 	@JacksonXmlProperty(isAttribute = true)
