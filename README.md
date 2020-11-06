@@ -19,11 +19,12 @@ Use the list next to the image to manage and reorder frames.
 
 Edit metadata by clicking its button, the form displayed is a minimal subset of
 possible ePUB metadata. For the date field, use either a 4 digit year, a year plus month,
-or a full year-month-day date.
+or a full year-month-day date. NOTE: only do this **after** selecting the images directory.
 
 Clicking "Build" will do the following:
 
 1. Generate frames as separate images in a `clips/` subdirectory. These are always PNG files for now.
+2. Save frame assignments and all metadata in a `comic.xml` file in the images directory
 2. Try to find a `page.xhtml` file in the images directory. This is a mustache-style template of a HTML file
 to be used as each page of the resulting comic. Currently, the variables available to that template
 are only `{{title}}` (as set in metadata) and `{{image}}`, containing the current page, or subframe's image path.
