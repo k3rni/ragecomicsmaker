@@ -5,8 +5,11 @@
 plugins {
     id 'java'
     id 'application'
+    // Uberjar packager
     id 'com.github.johnrengelman.shadow' version '6.1.0'
+    // Creates Windows executables
     id "edu.sc.seis.launch4j" version "2.4.8"
+    // Creates OSX executables and dmg files (but must build on Mac)
     id "edu.sc.seis.macAppBundle" version "2.3.0"
 }
 
