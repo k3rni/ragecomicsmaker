@@ -1,8 +1,6 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
 import com.google.common.eventbus.Subscribe;
-//import com.jgoodies.forms.builder.FormBuilder;
-//import com.jgoodies.forms.builder.ListViewBuilder;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
@@ -30,12 +28,13 @@ import static javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 public class FilesPanel extends JPanel implements DirSelectedEventListener {
 
 	private JTree fileTree;
-	private File curentProjectDir;
 	private Comic comic;
 
+	@SuppressWarnings("UnstableApiUsage")
 	public FilesPanel() {
 		super();
 		GridBagLayout layout = new GridBagLayout();
@@ -75,6 +74,7 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 
 		openDirBtn.addMouseListener(new SelectFileAction(this));
 		SaveAction saveAction = new SaveAction();
+
 		App.EVENT_BUS.register(saveAction);
 		saveBtn.addMouseListener(saveAction);
 
@@ -98,18 +98,17 @@ public class FilesPanel extends JPanel implements DirSelectedEventListener {
 			}
 		}
 		model.reload(root);
-		this.curentProjectDir = event.getSelectedDir();
 	}
 
 	private JScrollPane prepareFileTree() {
 		fileTree = new JTree(new String[]{});
 		fileTree.getSelectionModel().setSelectionMode(SINGLE_TREE_SELECTION);
 		fileTree.addTreeSelectionListener(new ImageFIleTreeSelectionListener());
-		JScrollPane jsp = new JScrollPane(fileTree);
-		return jsp;
+		return new JScrollPane(fileTree);
 	}
 
 	private class ImageFIleTreeSelectionListener implements TreeSelectionListener {
+		@SuppressWarnings("UnstableApiUsage")
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			TreePath newLeadSelectionPath = e.getNewLeadSelectionPath();

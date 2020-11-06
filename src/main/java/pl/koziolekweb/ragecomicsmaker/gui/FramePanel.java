@@ -8,17 +8,17 @@ import pl.koziolekweb.ragecomicsmaker.model.Frame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import static pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEvent.Direction.DOWN;
 import static pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEvent.Direction.UP;
 
+@SuppressWarnings("UnstableApiUsage")
 public class FramePanel extends JPanel {
 
 	private final Frame frame;
+	@SuppressWarnings("FieldCanBeLocal")
 	private final JButton removeBtn;
 	private boolean isLast;
 
@@ -41,15 +41,12 @@ public class FramePanel extends JPanel {
 		add(new JLabel(this.frame.getId() + "."), gbc);
 
 		final JCheckBox visibility = new JCheckBox((String) null, frame.isVisible());
-		visibility.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (visibility.isSelected())
-					FramePanel.this.frame.visible();
-				else
-					FramePanel.this.frame.unvisible();
-				App.EVENT_BUS.post(new FrameStateChangeEvent(FramePanel.this.frame));
-			}
+		visibility.addItemListener(e -> {
+			if (visibility.isSelected())
+				FramePanel.this.frame.visible();
+			else
+				FramePanel.this.frame.unvisible();
+			App.EVENT_BUS.post(new FrameStateChangeEvent(FramePanel.this.frame));
 		});
 
 		gbc.anchor = GridBagConstraints.WEST;

@@ -18,6 +18,7 @@ import java.awt.*;
  */
 public class App implements Runnable, ErrorEventListener {
 
+	@SuppressWarnings("UnstableApiUsage")
 	public static final EventBus EVENT_BUS = new EventBus();
 	private JFrame main;
 
@@ -37,6 +38,7 @@ public class App implements Runnable, ErrorEventListener {
 		main.setVisible(true);
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	private void mainPanel(JFrame main) {
 		Container mainPanel = main.getContentPane();
 		SpringLayout springLayout = new SpringLayout();
@@ -75,9 +77,10 @@ public class App implements Runnable, ErrorEventListener {
 
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	@Subscribe
 	public void handleErrorEvent(ErrorEvent event) {
-		JOptionPane.showConfirmDialog(main, event.message, "UWAGA!", JOptionPane.CLOSED_OPTION);
+		JOptionPane.showConfirmDialog(main, event.message, "UWAGA!", JOptionPane.DEFAULT_OPTION);
 	}
 }

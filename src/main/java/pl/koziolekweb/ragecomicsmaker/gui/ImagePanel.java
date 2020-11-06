@@ -31,6 +31,7 @@ import static java.awt.image.BufferedImage.TYPE_4BYTE_ABGR;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 public class ImagePanel extends JPanel implements ImageSelectedEventListener, FrameDroppedEventListener, DirSelectedEventListener, FrameStateChangeEventListener {
 
 	private BufferedImage image;
@@ -42,8 +43,8 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 	private int currentX;
 	private int currentY;
 
-	private FrameSizeCalculator fsc = new FrameSizeCalculator();
-	private RectangleDrawingMagic rdm = new RectangleDrawingMagic();
+	private final FrameSizeCalculator fsc = new FrameSizeCalculator();
+	private final RectangleDrawingMagic rdm = new RectangleDrawingMagic();
 	private Screen selectedScreen;
 	private Image scaledInstance;
 
@@ -173,6 +174,7 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 		repaint();
 	}
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	private boolean inImage(int posX, int posY) {
 		return posX > 0 && posX <= scaledInstance.getWidth(null)
 				&& posY > 0 && posY <= scaledInstance.getHeight(null);

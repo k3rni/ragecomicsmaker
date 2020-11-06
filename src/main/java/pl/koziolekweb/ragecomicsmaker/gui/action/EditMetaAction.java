@@ -11,8 +11,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Optional;
 
+@SuppressWarnings("UnstableApiUsage")
 public class EditMetaAction extends AbstractAction implements DirSelectedEventListener {
     private Comic comic;
 

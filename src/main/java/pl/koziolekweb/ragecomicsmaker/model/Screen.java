@@ -6,7 +6,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import java.io.File;
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
@@ -89,7 +88,7 @@ public class Screen implements Serializable, Comparable<Screen> {
 	}
 
 	private void recount() {
-		TreeSet<Frame> newFrames = new TreeSet<Frame>();
+		TreeSet<Frame> newFrames = new TreeSet<>();
 		int i = 0;
 		for (Frame frame : frames) {
 			newFrames.add(new Frame(frame, i));

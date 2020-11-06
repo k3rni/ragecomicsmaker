@@ -24,6 +24,7 @@ import static pl.koziolekweb.ragecomicsmaker.event.SwitchFrameEvent.Direction.UP
 /**
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 public class FramesPanel extends JPanel implements ImageSelectedEventListener, AddFrameEventListener,
 		RemoveFrameEventListener, DirSelectedEventListener, SwitchFrameEventListener {
 
@@ -91,12 +92,11 @@ public class FramesPanel extends JPanel implements ImageSelectedEventListener, A
 		if (event.direction == UP) {
 			if (currentId == 0) return;
 			selectedScreen.moveFrameUp(event.frame);
-			App.EVENT_BUS.post(new ImageSelectedEvent(null, selectedScreen));
 		} else {
 			if (currentId == selectedScreen.getScreenSize()) return;
 			selectedScreen.moveFrameDown(event.frame);
-			App.EVENT_BUS.post(new ImageSelectedEvent(null, selectedScreen));
 		}
+		App.EVENT_BUS.post(new ImageSelectedEvent(null, selectedScreen));
 
 	}
 }

@@ -2,13 +2,7 @@ package pl.koziolekweb.ragecomicsmaker.gui.action;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 import com.google.common.io.Files;
-import nl.siegmann.epublib.domain.*;
-import nl.siegmann.epublib.epub.EpubWriter;
-import org.apache.commons.io.FilenameUtils;
 import pl.koziolekweb.ragecomicsmaker.ComicCompiler;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
@@ -26,20 +20,16 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 public class SaveAction extends MouseAdapter implements DirSelectedEventListener {
-
-
 	private Comic comic;
 	private File targetDir;
-	private DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
+	private final DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -102,11 +92,11 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 		double y = frame.getStartY() * image.getHeight();
 		double h = frame.getSizeY() * image.getHeight();
 
-		BufferedImage clip = image.getSubimage((int) Math.round(x),
+		return image.getSubimage(
+				(int) Math.round(x),
 				(int) Math.round(y),
 				(int) Math.round(w),
 				(int) Math.round(h));
-		return clip;
 	}
 
 	@Override

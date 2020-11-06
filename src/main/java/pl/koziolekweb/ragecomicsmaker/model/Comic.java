@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -21,6 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 @XmlRootElement(name = "comic")
 public class Comic implements Serializable {
 	@JacksonXmlProperty(isAttribute = true)
@@ -43,7 +45,7 @@ public class Comic implements Serializable {
 
 	@JacksonXmlElementWrapper(localName = "screens")
 	@JsonProperty(value = "screen") // Applies to elements of this set
-	private TreeSet<Screen> screens = new TreeSet<Screen>();
+	private TreeSet<Screen> screens = new TreeSet<>();
 
 	@JsonProperty
 	public String description;
@@ -69,6 +71,7 @@ public class Comic implements Serializable {
 	 *
 	 * @return Comic with default values
 	 */
+	@SuppressWarnings("UnusedReturnValue")
 	public Comic initDefaults() {
 		this.version = 0;
 		this.id = "";
@@ -162,7 +165,7 @@ public class Comic implements Serializable {
 		checkNotNull(lastSelectedPathComponent);
 		String filename = lastSelectedPathComponent.split(" ", 2)[0];
 		Collection<Screen> filtered = Collections2.filter(screens, input -> {
-			File image = input.getImage();
+			File image = Objects.requireNonNull(input).getImage();
 			if (image == null) return false;
 			return filename.equals(image.getName());
 		});
@@ -173,7 +176,8 @@ public class Comic implements Serializable {
 	public Screen findScreenByIndex(String number) {
 		try {
 			final int intNumber = Integer.parseInt(number);
-			Collection<Screen> filtered = Collections2.filter(screens, input -> input.getIndex() == intNumber);
+			Collection<Screen> filtered = Collections2.filter(screens,
+					input -> Objects.requireNonNull(input).getIndex() == intNumber);
 			if (filtered.iterator().hasNext())
 				return filtered.iterator().next();
 			return new Screen(); // tak naprawdę do niczego nie podpiety null object

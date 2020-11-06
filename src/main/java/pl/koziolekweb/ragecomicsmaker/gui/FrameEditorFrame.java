@@ -14,10 +14,10 @@ import java.awt.event.MouseEvent;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 public class FrameEditorFrame extends JFrame {
 
 	private final Frame frame;
-	private final GridBagConstraints gbc;
 	private final DoubleFormFieldPanel width;
 	private final DoubleFormFieldPanel height;
 	private final DoubleFormFieldPanel startX;
@@ -27,8 +27,8 @@ public class FrameEditorFrame extends JFrame {
 		super("Set frame cords " + frame.getId());
 		this.frame = frame;
 		setLayout(new GridBagLayout());
-		this.gbc = new GridBagConstraints();
-		this.gbc.gridy = 0;
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridy = 0;
 
 		width = new DoubleFormFieldPanel("Width", frame.getSizeX());
 		gbc.gridx = 0;
@@ -107,6 +107,7 @@ public class FrameEditorFrame extends JFrame {
 		public abstract T getValue();
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	class DoubleFormFieldPanel extends FromFieldPanel<Double> {
 
 		public DoubleFormFieldPanel(String message, Double value) {

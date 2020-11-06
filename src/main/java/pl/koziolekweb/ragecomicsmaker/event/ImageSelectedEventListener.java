@@ -6,5 +6,5 @@ package pl.koziolekweb.ragecomicsmaker.event;
  */
 public interface ImageSelectedEventListener {
 
-	public void handleDirSelectedEvent(ImageSelectedEvent event);
+	void handleDirSelectedEvent(ImageSelectedEvent event);
 }

@@ -1,6 +1,5 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -151,8 +150,7 @@ public class Frame implements Comparable<Frame> {
 		String[] split = relativeArea.split(" ");
 		Double[] doubles =
 				transform(
-						transform(asList(split),
-								input -> Double.valueOf(input)),
+						transform(asList(split), Double::valueOf),
 						input -> {
 							checkArgument(input >= 0.);
 							checkArgument(input <= 1.);

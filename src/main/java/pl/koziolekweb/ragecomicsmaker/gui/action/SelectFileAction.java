@@ -13,10 +13,9 @@ import java.io.File;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 public class SelectFileAction extends MouseAdapter {
-
-
-	private Component parent;
+	private final Component parent;
 
 	public SelectFileAction(Component parent) {
 		this.parent = parent;

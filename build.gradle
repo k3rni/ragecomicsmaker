@@ -48,7 +48,7 @@ mainClassName = 'pl.koziolekweb.ragecomicsmaker.App'
 group = 'pl.koziolekweb.ragecomicsmaker'
 version = '1.1.0-SNAPSHOT'
 description = 'ragecomicsmaker'
-sourceCompatibility = '1.8'
+sourceCompatibility = '1.9'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

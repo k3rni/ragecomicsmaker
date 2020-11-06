@@ -61,7 +61,7 @@ public class ComicCompiler {
         String ext = FilenameUtils.getExtension(image.getName());
 
         StringWriter writer = new StringWriter();
-        HashMap<String, Object> scope = new HashMap();
+        HashMap<String, Object> scope = new HashMap<>();
 
         scope.put("title", comic.getTitle());
         scope.put("image", String.format("screens/%s.%d.%s", stem, frame.getId(), ext));
@@ -72,19 +72,24 @@ public class ComicCompiler {
     }
 
     private Reader buildPage(Screen screen, Mustache template) {
-        File image = screen.getImage();
-        String stem = FilenameUtils.getBaseName(image.getName());
-        String ext = FilenameUtils.getExtension(image.getName());
-
         StringWriter writer = new StringWriter();
-        HashMap<String, Object> scope = new HashMap();
-
-        scope.put("title", comic.getTitle());
-        scope.put("image", String.format("screens/%s.%s", stem, ext));
+        HashMap<String, Object> scope = pageScope(screen, this.comic);
 
         template.execute(writer, scope);
 
         return new StringReader(writer.toString());
+    }
+
+    private HashMap<String, Object> pageScope(Screen screen, Comic comic) {
+        File image = screen.getImage();
+        String stem = FilenameUtils.getBaseName(image.getName());
+        String ext = FilenameUtils.getExtension(image.getName());
+
+        HashMap<String, Object> scope = new HashMap();
+
+        scope.put("title", comic.getTitle());
+        scope.put("image", String.format("screens/%s.%s", stem, ext));
+        return scope;
     }
 
     private Mustache findTemplate() {

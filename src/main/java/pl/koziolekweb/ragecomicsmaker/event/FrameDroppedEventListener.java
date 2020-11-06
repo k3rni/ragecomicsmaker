@@ -6,5 +6,5 @@ package pl.koziolekweb.ragecomicsmaker.event;
  */
 public interface FrameDroppedEventListener {
 
-	public void handleFrameDroppedEvent(FrameDroppedEvent event);
+	void handleFrameDroppedEvent(FrameDroppedEvent event);
 }

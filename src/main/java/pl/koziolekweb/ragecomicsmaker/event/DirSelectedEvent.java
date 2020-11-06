@@ -8,8 +8,6 @@ import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +17,7 @@ import java.util.List;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
+@SuppressWarnings("UnstableApiUsage")
 public class DirSelectedEvent {
 
 	private final File selectedDir;
@@ -33,15 +32,12 @@ public class DirSelectedEvent {
 	public List<File> getImages(final String namePattern) {
 		if (selectedDir == null)
 			return Collections.emptyList();
-		File[] files = selectedDir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				String pattern = "screen";
-				if (namePattern != null && !namePattern.isEmpty())
-					pattern = namePattern.split("@")[0];
+		File[] files = selectedDir.listFiles((dir, name) -> {
+			String pattern = "screen";
+			if (namePattern != null && !namePattern.isEmpty())
+				pattern = namePattern.split("@")[0];
 
-				return name.matches(pattern + "[0-9]+\\.(jpg|png)");
-			}
+			return name.matches(pattern + "[0-9]+\\.(jpg|png)");
 		});
 		return Arrays.asList(files);
 	}
@@ -55,18 +51,13 @@ public class DirSelectedEvent {
 	}
 
 	private Comic prepareModel() {
-		File[] comicFileName = selectedDir.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.getName().equals("comic.xml");
-			}
-		});
+		File[] comicFileName = selectedDir.listFiles(pathname -> pathname.getName().equals("comic.xml"));
 		if (comicFileName.length == 1) {
 			ObjectMapper mapper = new XmlMapper();
 			try {
 				final Comic from = mapper.readValue(comicFileName[0], Comic.class);
 				List<File> images = getImages(from.getImages().getNamePattern());
-				Collections.sort(images);;
+				Collections.sort(images);
 				if (images.size() != from.getScreens().size()) {
 					App.EVENT_BUS.post(new ErrorEvent("Liczba obarazów inna niż zadeklarowana w pliku!", null));
 //					return from;
