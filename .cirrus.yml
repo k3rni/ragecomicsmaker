@@ -1,17 +1,55 @@
 
-check_task:
-  gradle_cache:
-    folder: ~/.gradle/caches
-  check_script: gradle check
-  cleanup_before_cache-script:
-    - rm -rf ~/.gradle/caches/$GRADLE_VERSION
-    - rm -rf ~/.gradle/caches/transforms-1
-    - rm -rf ~/.gradle/caches/journal-1
-    - rm -rf ~/.gradle/caches/jars-3/*/buildSrc.jar
-    - find ~/.gradle/caches/ -name '*.lock' -type f -delete
+#check_task:
+#  gradle_cache:
+#    folder: ~/.gradle/caches
+#  check_script: gradle check
+#  cleanup_before_cache-script:
+#    - rm -rf ~/.gradle/caches/$GRADLE_VERSION
+#    - rm -rf ~/.gradle/caches/transforms-1
+#    - rm -rf ~/.gradle/caches/journal-1
+#    - rm -rf ~/.gradle/caches/jars-3/*/buildSrc.jar
+#    - find ~/.gradle/caches/ -name '*.lock' -type f -delete
 
-task:
-  name: Build shadowJar
+.jar: &jar_artifacts
+  path: build/libs/ragecomicsmaker-*-all.jar
+  type: application/java-archive
+
+linux_task:
+  name: Build Linux jar
   container:
     image: gradle:jdk11
-  run_script: gradle shadowJar
+  build_script: gradle shadowJar
+  linux_jar_artifacts:
+    <<: *jar_artifacts
+
+windows_task:
+  name: Build Windows jar and exe
+  env:
+    JAVA_HOME: "C:\\Program Files\\ojdkbuild\\java-11-openjdk-11.0.8-1\\"
+  windows_container:
+    image: cirrusci/windowsservercore:2019
+  setup_script:
+    - choco install --yes --no-progress ojdkbuild11 gradle
+  buildjar_script: c:\\programdata\\chocolatey\\bin\\gradle shadowJar
+  windows_jar_artifacts:
+    <<: *jar_artifacts
+  buildexe_script: c:\\programdata\\chocolatey\\bin\\gradle createExe
+  exe_artifacts:
+    path: build/launch4j/*.exe
+    type: application/vmd.microsoft.portable-executable
+
+macos_task:
+  name: Build MacOS jar and app/dmg
+  osx_instance:
+    image: catalina-xcode
+  setup_script:
+    - brew install openjdk@11 gradle
+  buildjar_script: gradle shadowJar
+  macos_jar_artifacts:
+    <<: *jar_artifacts
+  dmg_script:
+    - gradle createDmg
+    - ls -lR build/distributions
+  macos_dmg_artifacts:
+    path: build/distributions/*.dmg
+    type: application/x-apple-diskimage
