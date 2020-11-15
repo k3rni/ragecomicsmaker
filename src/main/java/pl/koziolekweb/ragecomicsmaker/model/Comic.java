@@ -1,5 +1,6 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -11,9 +12,7 @@ import pl.koziolekweb.ragecomicsmaker.event.MetadataUpdateEvent;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -197,4 +196,9 @@ public class Comic implements Serializable {
 		this.isbn = event.isbn;
 		this.rights = event.rights;
 	}
+
+	@JsonIgnore
+    public String getLabel() {
+        return "BOOK";
+    }
 }

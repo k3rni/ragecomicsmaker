@@ -11,6 +11,7 @@ plugins {
     id "edu.sc.seis.launch4j" version "2.4.8"
     // Creates OSX executables and dmg files (but must build on Mac)
     id "edu.sc.seis.macAppBundle" version "2.3.0"
+    id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
 repositories {
@@ -21,23 +22,25 @@ repositories {
 }
 
 dependencies {
-    // Form Layout, used for metadata form
-    implementation 'com.miglayout:miglayout-core:5.2'
-    implementation 'com.miglayout:miglayout-swing:5.2'
     // ePUB generation
     implementation 'com.positiondev.epublib:epublib-core:3.1'
     // XML serialization
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.1'
     implementation 'com.fasterxml.woodstox:woodstox-core:5.1.0'
     // Utilities
-    implementation 'com.google.guava:guava:18.0'
+    implementation 'com.google.guava:guava:30.0-jre'
     implementation 'org.apache.commons:commons-io:1.3.2'
     // Image format support. Java's built-in jpeg is very limited.
     implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.0-rc5'
     // Template language used for XHTML file generation
     implementation 'com.github.spullara.mustache.java:compiler:0.9.7'
-    // Modern UI
-    implementation 'com.formdev:flatlaf:0.43'
+    implementation 'org.fxmisc.easybind:easybind:1.0.3'
+    implementation 'net.coobird:thumbnailator:0.4.13'
+
+    implementation 'org.openjfx:javafx-controls:11.0.3'
+    implementation 'org.openjfx:javafx-fxml:11.0.3'
+    implementation 'org.openjfx:javafx-graphics:11.0.3'
+    implementation 'org.controlsfx:controlsfx:11.0.3'
 
     testImplementation 'org.testng:testng:6.8.8'
     testImplementation 'org.easytesting:fest-assert-core:2.0M10'
@@ -49,6 +52,11 @@ group = 'pl.koziolekweb.ragecomicsmaker'
 version = '1.1.0-SNAPSHOT'
 description = 'ragecomicsmaker'
 sourceCompatibility = '1.9'
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.swing' ]
+    mainClassName = project.mainClassName
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -70,9 +78,11 @@ macAppBundle {
 }
 
 shadowJar {
-    mainClassName = project.mainClassName
+    mainClassName = 'pl.koziolekweb.ragecomicsmaker.Launcher'
     minimize {
-        exclude dependency('com.formdev:flatlaf:.*')
+        exclude dependency('org.openjfx:.*:.*')
+        exclude dependency('com.fasterxml.woodstox:.*:.*')
+        exclude dependency('com.twelvemonkeys.imageio:.*:.*')
     }
 }
 

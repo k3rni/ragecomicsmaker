@@ -35,9 +35,6 @@ public class Frame implements Comparable<Frame> {
 	@JacksonXmlProperty(isAttribute = true)
 	private int id;
 
-	/**
-	 * Frame is visible by default. This field is @JsonIgnore and will be ignored by JAXB (un)marshaller.
-	 */
 	@JsonIgnore
 	private boolean visibility = true;
 
@@ -169,6 +166,11 @@ public class Frame implements Comparable<Frame> {
 		if (that == null)
 			return 1;
 		return start().compare(this.id, that.id).result();
+	}
+
+	@JsonIgnore
+	public String getLabel() {
+		return String.format("%d", id);
 	}
 
 }

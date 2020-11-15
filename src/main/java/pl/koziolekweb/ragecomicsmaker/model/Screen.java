@@ -1,13 +1,19 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.nio.Buffer;
+import java.util.Set;
 import java.util.TreeSet;
 
 import static com.google.common.collect.ComparisonChain.start;
@@ -19,7 +25,7 @@ import static com.google.common.collect.ComparisonChain.start;
 public class Screen implements Serializable, Comparable<Screen> {
 
 	@JacksonXmlProperty(isAttribute = true)
-	private int index;
+	private long index;
 
 	@JacksonXmlProperty(isAttribute = true)
 	private String bgcolor;
@@ -27,13 +33,19 @@ public class Screen implements Serializable, Comparable<Screen> {
 	@JacksonXmlElementWrapper(localName = "frames")
 	@JsonProperty(value = "frame")
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private Collection<Frame> frames;
+	private Set<Frame> frames;
 
 	// a teraz drogie dzieci nie xmlowa część modelu tzw. core
 	private File image;
 
+	public Screen(File image, String bgcolor, long index) {
+		this.image = image;
+		this.bgcolor = bgcolor;
+		this.index = index;
+	}
+
 	public Screen() {
-		frames = new ArrayList<>();
+		frames = new TreeSet<>();
 	}
 
 	public File getImage() {
@@ -48,11 +60,11 @@ public class Screen implements Serializable, Comparable<Screen> {
 		frames.add(frame);
 	}
 
-	public int getIndex() {
+	public long getIndex() {
 		return index;
 	}
 
-	public void setIndex(int index) {
+	public void setIndex(long index) {
 		this.index = index;
 	}
 
@@ -64,7 +76,7 @@ public class Screen implements Serializable, Comparable<Screen> {
 		this.bgcolor = bgcolor;
 	}
 
-	public Collection<Frame> getFrames() {
+	public Set<Frame> getFrames() {
 		int i = 0;
 		for (Frame frame : frames) {
 			frame.setId(i);
@@ -74,8 +86,29 @@ public class Screen implements Serializable, Comparable<Screen> {
 		return frames;
 	}
 
+	public Frame findFrame(int id) {
+		return frames.stream()
+				.filter((f) -> f.getId() == id)
+				.findFirst().orElse(null);
+	}
+
+	public BufferedImage crop(Frame frame) throws IOException {
+		BufferedImage image = ImageIO.read(this.image);
+
+		double x = frame.getStartX() * image.getWidth();
+		double w = frame.getSizeX() * image.getWidth();
+		double y = frame.getStartY() * image.getHeight();
+		double h = frame.getSizeY() * image.getHeight();
+
+		return image.getSubimage(
+				(int) Math.round(x),
+				(int) Math.round(y),
+				(int) Math.round(w),
+				(int) Math.round(h));
+	}
+
 	@Override
-	public int compareTo(Screen that) {
+	public int compareTo(@Nullable Screen that) {
 		if (that == null)
 			return 1;
 		return start().compare(this.index, that.index)
@@ -116,5 +149,12 @@ public class Screen implements Serializable, Comparable<Screen> {
 	@JsonIgnore
 	public int getScreenSize() {
 		return getFrames().size();
+	}
+
+	@JsonIgnore
+	public String getLabel() {
+		if (frames.isEmpty())
+			return image.getName();
+		return String.format("%s [%d]", image.getName(), frames.size());
 	}
 }

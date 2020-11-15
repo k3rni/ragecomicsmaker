@@ -5,13 +5,9 @@ import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.FrameSizeCalculator;
 import pl.koziolekweb.ragecomicsmaker.event.AddFrameEvent;
 import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
-import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEvent;
-import pl.koziolekweb.ragecomicsmaker.event.FrameDroppedEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.FrameStateChangeEvent;
-import pl.koziolekweb.ragecomicsmaker.event.FrameStateChangeEventListener;
 import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEvent;
-import pl.koziolekweb.ragecomicsmaker.event.ImageSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
@@ -32,7 +28,7 @@ import static java.awt.image.BufferedImage.TYPE_4BYTE_ABGR;
  * User: koziolek
  */
 @SuppressWarnings("UnstableApiUsage")
-public class ImagePanel extends JPanel implements ImageSelectedEventListener, FrameDroppedEventListener, DirSelectedEventListener, FrameStateChangeEventListener {
+public class ImagePanel extends JPanel {
 
 	private BufferedImage image;
 	private boolean paintNewFrame = false;
@@ -143,25 +139,27 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 		return image.getWidth() / (double) image.getHeight();
 	}
 
-	@Override
 	@Subscribe
 	public void handleDirSelectedEvent(ImageSelectedEvent event) {
 		try {
-			selectedScreen = event.selectedScreen;
-			image = ImageIO.read(selectedScreen.getImage());
-			repaint();
+			openScreen(event.selectedScreen);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	@Override
+	void openScreen(Screen selectedScreen) throws IOException {
+		this.selectedScreen = selectedScreen;
+		this.image = ImageIO.read(selectedScreen.getImage());
+		repaint();
+	}
+
 	@Subscribe
 	public void handleFrameDroppedEvent(FrameDroppedEvent event) {
 		repaint();
 	}
 
-	@Override
+	@Subscribe
 	public void handleDirSelectedEvent(DirSelectedEvent event) {
 		this.image = null;
 		this.scaledInstance = null;
@@ -169,8 +167,8 @@ public class ImagePanel extends JPanel implements ImageSelectedEventListener, Fr
 		this.paintNewFrame = false;
 	}
 
-	@Override
-	public void handelFrameStateChangeEvent(FrameStateChangeEvent event) {
+	@Subscribe
+	public void handleFrameStateChangeEvent(FrameStateChangeEvent event) {
 		repaint();
 	}
 

@@ -1,19 +1,17 @@
-package pl.koziolekweb.ragecomicsmaker.gui.action;
+package pl.koziolekweb.ragecomicsmaker;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.io.Files;
+import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
 import pl.koziolekweb.ragecomicsmaker.ComicCompiler;
-import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
-import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEventListener;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileSystems;
@@ -26,39 +24,32 @@ import java.time.format.DateTimeFormatter;
  * User: koziolek
  */
 @SuppressWarnings("UnstableApiUsage")
-public class SaveAction extends MouseAdapter implements DirSelectedEventListener {
+public class SaveCommand {
 	private Comic comic;
 	private File targetDir;
 	private final DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		super.mouseClicked(e);
-		try {
-
-			String name = targetDir.getAbsolutePath() + File.separator + "comic.xml";
-			File comicFile = new File(name);
-			if (comicFile.exists()) {
-				File backup = new File(targetDir.getAbsolutePath() + File.separator + "backup-" +
-						sdf.format(LocalDateTime.now())
-						+ "-comic.xml");
-				Files.move(comicFile, backup);
-			}
-			comicFile.createNewFile();
-			XmlMapper mapper = new XmlMapper();
-			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new FileOutputStream(name), comic);
-			// Iterate over all images in comic and their crops. Use ImageIO to produce tiny cropped files
-			saveSubImages();
-			new ComicCompiler(targetDir, comic).save();
-			JOptionPane.showMessageDialog(null,
-					String.format("Saved comic into %s as book.epub", targetDir.getCanonicalPath()));
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+	public SaveCommand(Comic comic, File targetDir) {
+		this.comic = comic;
+		this.targetDir = targetDir;
 	}
 
-
+	public void save() throws IOException {
+		String name = targetDir.getAbsolutePath() + File.separator + "comic.xml";
+		File comicFile = new File(name);
+		if (comicFile.exists()) {
+			File backup = new File(targetDir.getAbsolutePath() + File.separator + "backup-" +
+					sdf.format(LocalDateTime.now())
+					+ "-comic.xml");
+			Files.move(comicFile, backup);
+		}
+		comicFile.createNewFile();
+		XmlMapper mapper = new XmlMapper();
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.writeValue(new FileOutputStream(name), comic);
+		// Iterate over all images in comic and their crops. Use ImageIO to produce tiny cropped files
+		saveSubImages();
+	}
 
 	private void saveSubImages() throws IOException {
 		for (Screen screen : comic.getScreens()) {
@@ -86,6 +77,7 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 		return String.format("%1$03d_%2$03d.png", screen.getIndex(), frame.getId());
 	}
 
+	// Now also available as Screen.crop
 	private BufferedImage getSubImage(BufferedImage image, Frame frame) {
 		double x = frame.getStartX() * image.getWidth();
 		double w = frame.getSizeX() * image.getWidth();
@@ -97,11 +89,5 @@ public class SaveAction extends MouseAdapter implements DirSelectedEventListener
 				(int) Math.round(y),
 				(int) Math.round(w),
 				(int) Math.round(h));
-	}
-
-	@Override
-	public void handleDirSelectedEvent(DirSelectedEvent event) {
-		this.comic = event.getModel();
-		this.targetDir = event.getSelectedDir();
 	}
 }
