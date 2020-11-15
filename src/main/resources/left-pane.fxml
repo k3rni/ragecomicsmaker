@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane dividerPositions="0.5" orientation="VERTICAL" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.koziolekweb.ragecomicsmaker.gui.LeftPaneController">
+    <items>
+        <ListView fx:id="filePane" minWidth="320.0" />
+        <VBox fx:id="framesList" minWidth="320.0" />
+    </items>
+</SplitPane>

@@ -1,0 +1,17 @@
+
+check_task:
+  gradle_cache:
+    folder: ~/.gradle/caches
+  check_script: gradle check
+  cleanup_before_cache-script:
+    - rm -rf ~/.gradle/caches/$GRADLE_VERSION
+    - rm -rf ~/.gradle/caches/transforms-1
+    - rm -rf ~/.gradle/caches/journal-1
+    - rm -rf ~/.gradle/caches/jars-3/*/buildSrc.jar
+    - find ~/.gradle/caches/ -name '*.lock' -type f -delete
+
+task:
+  name: Build shadowJar
+  container:
+    image: gradle:jdk11
+  run_script: gradle shadowJar
