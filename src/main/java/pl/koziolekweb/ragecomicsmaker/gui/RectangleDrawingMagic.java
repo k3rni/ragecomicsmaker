@@ -66,6 +66,8 @@ public class RectangleDrawingMagic {
 		g.fillRect(countPosition(startX, currentX) - 8, countPosition(startY, currentY) - 28, 32, 32);
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, 32));
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.drawString(number, countPosition(startX, currentX), countPosition(startY, currentY));
 	}
 
