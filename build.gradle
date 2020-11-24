@@ -7,18 +7,16 @@ plugins {
     id 'application'
     // Uberjar packager
     id 'com.github.johnrengelman.shadow' version '6.1.0'
-    // Creates Windows executables
-    id "edu.sc.seis.launch4j" version "2.4.8"
-    // Creates OSX executables and dmg files (but must build on Mac)
-    id "edu.sc.seis.macAppBundle" version "2.3.0"
     id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.beryx.runtime' version '1.11.4'
 }
 
 repositories {
     jcenter()
-    maven {
-        url = uri('https://repo.maven.apache.org/maven2')
-    }
+//    maven {
+//        url = uri('https://repo.maven.apache.org/maven2')
+//    }
+    mavenCentral()
 }
 
 dependencies {
@@ -51,11 +49,16 @@ mainClassName = 'pl.koziolekweb.ragecomicsmaker.App'
 group = 'pl.koziolekweb.ragecomicsmaker'
 version = '2.0.0'
 description = 'ragecomicsmaker'
-sourceCompatibility = '1.9'
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 javafx {
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.swing' ]
+}
+
+application {
     mainClassName = project.mainClassName
+    applicationName = 'RageComicsMaker'
 }
 
 tasks.withType(JavaCompile) {
@@ -66,23 +69,37 @@ test {
     useTestNG()
 }
 
-launch4j {
-    mainClassName = project.mainClassName
-    outfile = 'ragecomicsmaker.exe'
-    copyConfigurable = []
-    jar = "${shadowJar.archivePath}"
-}
-
-macAppBundle {
-    mainClassName = project.mainClassName
-}
-
 shadowJar {
     mainClassName = 'pl.koziolekweb.ragecomicsmaker.Launcher'
     minimize {
         exclude dependency('org.openjfx:.*:.*')
         exclude dependency('com.fasterxml.woodstox:.*:.*')
         exclude dependency('com.twelvemonkeys.imageio:.*:.*')
+    }
+}
+
+runtime {
+    options = ['--strip-debug',
+               '--compress', '2',
+               '--no-header-files',
+               '--no-man-pages']
+
+    launcher {
+        noConsole = true
+    }
+
+    jpackage {
+        jpackageHome = System.getenv('HOME') + '/.asdf/installs/java/adoptopenjdk-14.0.2+12/'
+        def currentOs = org.gradle.internal.os.OperatingSystem.current()
+        if (currentOs.windows) {
+            installerOptions += ['--win-per-user-install', '--win-dir-chooser', '--win-menu', '--win-shortcut']
+        } else if (currentOs.linux) {
+            installerType = 'app-image'
+            installerOptions += ['--linux-package-name', 'ragecomicsmaker', '--linux-shortcut']
+        } else if (currentOs.macOsX) {
+            installerType = 'dmg'
+            installerOptions += ['--mac-package-name', 'ragecomicsmaker']
+        }
     }
 }
 
