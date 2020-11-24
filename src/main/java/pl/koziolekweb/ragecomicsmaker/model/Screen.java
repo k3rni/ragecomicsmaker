@@ -39,6 +39,7 @@ public class Screen implements Serializable, Comparable<Screen> {
 	private File image;
 
 	public Screen(File image, String bgcolor, long index) {
+		this();
 		this.image = image;
 		this.bgcolor = bgcolor;
 		this.index = index;
