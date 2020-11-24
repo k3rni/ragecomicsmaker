@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.google.common.collect.Collections2;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.event.MetadataUpdateEvent;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.beans.BeanProperty;
+import java.beans.JavaBean;
 import java.io.File;
 import java.io.Serializable;
 import java.util.*;
@@ -29,7 +33,8 @@ public class Comic implements Serializable {
 	@JacksonXmlProperty(isAttribute = true)
 	private String id;
 
-	public String title;
+	@JsonIgnore
+	public StringProperty title = new SimpleStringProperty("");
 
 	@JacksonXmlProperty(isAttribute = true)
 	private Direction direction;
@@ -46,20 +51,20 @@ public class Comic implements Serializable {
 	@JsonProperty(value = "screen") // Applies to elements of this set
 	private TreeSet<Screen> screens = new TreeSet<>();
 
-	@JsonProperty
-	public String description;
-	@JsonProperty
-	public String author;
-	@JsonProperty
-	public String illustrator;
-	@JsonProperty
-	public String publisher;
-	@JsonProperty
-	public String publicationDate;
-	@JsonProperty
-	public String isbn;
-	@JsonProperty
-	public String rights;
+	@JsonIgnore
+	public StringProperty description = new SimpleStringProperty("");
+	@JsonIgnore
+	public StringProperty author = new SimpleStringProperty("");
+	@JsonIgnore
+	public StringProperty illustrator  = new SimpleStringProperty("");
+	@JsonIgnore
+	public StringProperty publisher  = new SimpleStringProperty("");
+	@JsonIgnore
+	public StringProperty publicationDate  = new SimpleStringProperty("");
+	@JsonIgnore
+	public StringProperty isbn  = new SimpleStringProperty("");
+	@JsonIgnore
+	public StringProperty rights  = new SimpleStringProperty("");
 
 	public Comic() {
 		initDefaults();
@@ -74,7 +79,7 @@ public class Comic implements Serializable {
 	public Comic initDefaults() {
 		this.version = 0;
 		this.id = "";
-		this.title = "";
+		this.title.set("");
 		this.direction = Direction.LTR;
 		this.orientation = "";
 		this.transition = "";
@@ -120,13 +125,35 @@ public class Comic implements Serializable {
 		this.id = id;
 	}
 
-	public String getTitle() {
-		return title;
+	@JsonProperty
+	public String getTitle() { return title.get(); }
+	public void setTitle(String title) {
+		this.title.set(title);
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+	@JsonProperty
+	public String getAuthor() { return this.author.get(); }
+	public void setAuthor(String author) { this.author.set(author); }
+
+	@JsonProperty
+	public String getIllustrator() { return this.illustrator.get(); }
+	public void setIllustrator(String illustrator) { this.illustrator.set(illustrator); }
+
+	@JsonProperty
+	public String getPublisher() { return this.publisher.get(); }
+	public void setPublisher(String publisher) { this.publisher.set(publisher); }
+
+	@JsonProperty
+	public String getRights() { return this.rights.get(); }
+	public void setRights(String rights) { this.rights.set(rights); }
+
+	@JsonProperty
+	public String getPublicationDate() { return this.publicationDate.get(); }
+	public void setPublicationDate(String date) { this.publicationDate.set(date); }
+
+	@JsonProperty
+	public String getDescription() { return this.description.get(); }
+	public void setDescription(String description) { this.description.set(description); }
 
 	public Direction getDirection() {
 		return direction;
@@ -185,20 +212,4 @@ public class Comic implements Serializable {
 			return new Screen();
 		}
 	}
-
-	public void updateMetadata(MetadataUpdateEvent event) {
-		this.title = event.title;
-		this.description = event.descr;
-		this.author = event.authors;
-		this.illustrator = event.illustrators;
-		this.publisher = event.publisher;
-		this.publicationDate = event.pubDate;
-		this.isbn = event.isbn;
-		this.rights = event.rights;
-	}
-
-	@JsonIgnore
-    public String getLabel() {
-        return "BOOK";
-    }
 }

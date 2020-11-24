@@ -133,17 +133,17 @@ public class ComicCompiler {
 
     private void buildBookMetadata(Metadata metadata) {
         metadata.setTitles(List.of(comic.getTitle()));
-        metadata.setDescriptions(List.of(comic.description));
+        metadata.setDescriptions(List.of(comic.description.get()));
         // This works for a single author. For a list, consider splitting and using setAuthors
-        metadata.addAuthor(new Author(comic.author));
+        metadata.addAuthor(new Author(comic.author.get()));
         // Same here: single illustrator
-        Author illustrator = new Author(comic.illustrator);
+        Author illustrator = new Author(comic.illustrator.get());
         illustrator.setRole("art");
         metadata.addAuthor(illustrator);
-        metadata.addPublisher(comic.publisher);
-        metadata.addIdentifier(new Identifier(Identifier.Scheme.ISBN, comic.isbn));
-        metadata.setRights(List.of(comic.rights));
-        metadata.addDate(new Date(comic.publicationDate, Date.Event.PUBLICATION));
+        metadata.addPublisher(comic.publisher.get());
+        metadata.addIdentifier(new Identifier(Identifier.Scheme.ISBN, comic.isbn.get()));
+        metadata.setRights(List.of(comic.rights.get()));
+        metadata.addDate(new Date(comic.publicationDate.get(), Date.Event.PUBLICATION));
     }
 
     private Path clipPath(String frameFilename) {
