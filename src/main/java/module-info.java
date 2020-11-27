@@ -15,4 +15,6 @@ module pl.koziolekweb.ragecomismaker {
     requires xmlpull;
 
     exports pl.koziolekweb.ragecomicsmaker;
+    opens pl.koziolekweb.ragecomicsmaker.gui;
+
 }
