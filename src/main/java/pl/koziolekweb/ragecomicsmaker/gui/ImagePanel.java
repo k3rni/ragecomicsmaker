@@ -185,6 +185,7 @@ public class ImagePanel extends JPanel {
 
 	void openScreen(Screen selectedScreen) throws IOException {
 		this.selectedScreen = selectedScreen;
+		this.scaledInstance = null;
 		this.image = ImageIO.read(selectedScreen.getImage());
 		repaint();
 	}
