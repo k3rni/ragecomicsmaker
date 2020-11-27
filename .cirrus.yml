@@ -1,15 +1,4 @@
 
-#check_task:
-#  gradle_cache:
-#    folder: ~/.gradle/caches
-#  check_script: gradle check
-#  cleanup_before_cache-script:
-#    - rm -rf ~/.gradle/caches/$GRADLE_VERSION
-#    - rm -rf ~/.gradle/caches/transforms-1
-#    - rm -rf ~/.gradle/caches/journal-1
-#    - rm -rf ~/.gradle/caches/jars-3/*/buildSrc.jar
-#    - find ~/.gradle/caches/ -name '*.lock' -type f -delete
-
 .jar: &jar_artifacts
   path: build/libs/ragecomicsmaker-*-all.jar
   type: application/java-archive
@@ -17,10 +6,11 @@
 linux_task:
   name: Build Linux jar
   container:
-    image: gradle:jdk11
-  build_script: gradle shadowJar
+    image: gradle:jdk15-hotspot
+  jar_script: gradle shadowJar
   linux_jar_artifacts:
     <<: *jar_artifacts
+
 
 windows_task:
   name: Build Windows jar and exe

@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.google.common.collect.Collections2;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
-import pl.koziolekweb.ragecomicsmaker.event.MetadataUpdateEvent;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.beans.BeanProperty;
 import java.beans.JavaBean;
 import java.io.File;
@@ -26,7 +25,7 @@ import static com.google.common.base.Preconditions.checkState;
  * User: koziolek
  */
 @SuppressWarnings("UnstableApiUsage")
-@XmlRootElement(name = "comic")
+@JacksonXmlRootElement(localName = "comic")
 public class Comic implements Serializable {
 	@JacksonXmlProperty(isAttribute = true)
 	private int version;

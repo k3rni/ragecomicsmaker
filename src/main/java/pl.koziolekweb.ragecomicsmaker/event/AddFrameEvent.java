@@ -2,8 +2,6 @@ package pl.koziolekweb.ragecomicsmaker.event;
 
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
  * Event message - release mouse new frame on img.
  * User: koziolek
@@ -29,14 +27,6 @@ public class AddFrameEvent {
 		public final double height;
 
 		public FrameRect(double startX, double startY, double width, double height) {
-			checkArgument(startX <= 1.);
-			checkArgument(startX >= 0.);
-			checkArgument(startY <= 1.);
-			checkArgument(startY >= 0.);
-			checkArgument(width <= 1.);
-			checkArgument(width >= 0.);
-			checkArgument(height <= 1.);
-			checkArgument(height >= 0.);
 			this.startX = startX;
 			this.startY = startY;
 			this.width = width;

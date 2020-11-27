@@ -21,7 +21,6 @@ import net.coobird.thumbnailator.Thumbnailator;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
-import javax.lang.model.type.NullType;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
