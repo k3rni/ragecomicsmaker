@@ -18,8 +18,11 @@ public class AddFrameEvent {
 		this.screen = screen;
 	}
 
-	public static class FrameRect {
+	public boolean tooSmall() {
+		return frameRect.width < 0.05 || frameRect.height < 0.05;
+	}
 
+	public static class FrameRect {
 		public final double startX;
 		public final double startY;
 		public final double width;

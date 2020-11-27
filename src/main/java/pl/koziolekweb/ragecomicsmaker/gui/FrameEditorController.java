@@ -57,6 +57,8 @@ public class FrameEditorController {
 
     @Subscribe
     public void handleAddFrameEvent(AddFrameEvent event) {
+        if (event.tooSmall())
+            return;
         Screen screen = event.screen;
         Frame frame = new Frame(screen.getScreenSize());
         frame.setStartX(event.frameRect.startX);
