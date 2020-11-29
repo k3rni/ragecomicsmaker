@@ -14,6 +14,7 @@ module pl.koziolekweb.ragecomismaker {
     requires com.github.mustachejava;
     requires org.apache.commons.io;
     requires epub.creator;
+    requires jsr305;
 
     opens pl.koziolekweb.ragecomicsmaker;
     opens pl.koziolekweb.ragecomicsmaker.model to com.fasterxml.jackson.databind;

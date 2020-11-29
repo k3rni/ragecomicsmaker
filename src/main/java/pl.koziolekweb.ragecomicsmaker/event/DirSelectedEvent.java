@@ -85,13 +85,4 @@ public class DirSelectedEvent {
 		return comic;
 	}
 
-	private void renumberScreens(Comic from, List<File> images) {
-		Collections2.filter(images, input -> {
-			String number = input.getName().replaceAll("\\D", "");
-			Screen screenByIndex = from.findScreenByIndex(number);
-			screenByIndex.setIndex(Integer.parseInt(number));
-			screenByIndex.setImage(input);
-			return true;
-		}).size();
-	}
 }

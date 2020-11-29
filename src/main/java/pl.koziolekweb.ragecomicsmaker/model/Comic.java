@@ -126,40 +126,49 @@ public class Comic implements Serializable {
 
 	@JsonProperty
 	public String getTitle() { return title.get(); }
+	@SuppressWarnings("unused")
 	public void setTitle(String title) {
 		this.title.set(title);
 	}
 
 	@JsonProperty
 	public String getAuthor() { return this.author.get(); }
+	@SuppressWarnings("unused")
 	public void setAuthor(String author) { this.author.set(author); }
 
 	@JsonProperty
 	public String getIllustrator() { return this.illustrator.get(); }
+	@SuppressWarnings("unused")
 	public void setIllustrator(String illustrator) { this.illustrator.set(illustrator); }
 
 	@JsonProperty
 	public String getPublisher() { return this.publisher.get(); }
+	@SuppressWarnings("unused")
 	public void setPublisher(String publisher) { this.publisher.set(publisher); }
 
 	@JsonProperty
 	public String getRights() { return this.rights.get(); }
+	@SuppressWarnings("unused")
 	public void setRights(String rights) { this.rights.set(rights); }
 
 	@JsonProperty
 	public String getPublicationDate() { return this.publicationDate.get(); }
+	@SuppressWarnings("unused")
 	public void setPublicationDate(String date) { this.publicationDate.set(date); }
 
 	@JsonProperty
 	public String getDescription() { return this.description.get(); }
+	@SuppressWarnings("unused")
 	public void setDescription(String description) { this.description.set(description); }
 
 	@JsonProperty
 	public String getISBN() { return this.isbn.get(); }
+	@SuppressWarnings("unused")
 	public void setISBN(String isbn) { this.isbn.set(isbn); }
 
 	@JsonProperty
 	public String getLanguage() { return this.language.get(); }
+	@SuppressWarnings("unused")
 	public void setLanguage(String language) { this.language.set(language); }
 
 	public Direction getDirection() {
@@ -192,31 +201,5 @@ public class Comic implements Serializable {
 
 	public void setBgcolor(String bgcolor) {
 		this.bgcolor = bgcolor;
-	}
-
-	public Screen findScreenByFileName(final String lastSelectedPathComponent) {
-		checkNotNull(lastSelectedPathComponent);
-		String filename = lastSelectedPathComponent.split(" ", 2)[0];
-		Collection<Screen> filtered = Collections2.filter(screens, input -> {
-			File image = Objects.requireNonNull(input).getImage();
-			if (image == null) return false;
-			return filename.equals(image.getName());
-		});
-		checkState(filtered.size() == 1);
-		return filtered.iterator().next();
-	}
-
-	public Screen findScreenByIndex(String number) {
-		try {
-			final int intNumber = Integer.parseInt(number);
-			Collection<Screen> filtered = Collections2.filter(screens,
-					input -> Objects.requireNonNull(input).getIndex() == intNumber);
-			if (filtered.iterator().hasNext())
-				return filtered.iterator().next();
-			return new Screen(); // tak naprawdę do niczego nie podpiety null object
-		} catch (Exception e) {
-			App.EVENT_BUS.post(new ErrorEvent("Nieoczekiwany błąd odczytu - nieprawidłowy numer pliku " + number, e));
-			return new Screen();
-		}
 	}
 }

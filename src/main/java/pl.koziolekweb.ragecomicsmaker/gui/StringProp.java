@@ -4,7 +4,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import org.controlsfx.control.PropertySheet;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 class StringProp<P extends StringProperty> implements PropertySheet.Item {
