@@ -3,18 +3,23 @@ package pl.koziolekweb.ragecomicsmaker;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
-import nl.siegmann.epublib.domain.*;
-import nl.siegmann.epublib.epub.EpubWriter;
+import coza.opencollab.epub.creator.impl.TocCreatorDefault;
+import coza.opencollab.epub.creator.model.Content;
+import coza.opencollab.epub.creator.model.EpubBook;
+import coza.opencollab.epub.creator.util.EpubWriter;
 import org.apache.commons.io.FilenameUtils;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
+
+import static coza.opencollab.epub.creator.api.MetadataItem.builder;
 
 public class ComicCompiler {
     private final File targetDir;
@@ -25,8 +30,9 @@ public class ComicCompiler {
         this.comic = comic;
     }
     public void save() throws IOException {
-        Book book = new Book();
-        buildBookMetadata(book.getMetadata());
+        EpubBook book = new EpubBook();
+
+        setMetadata(book);
         addBookImages(book);
 
         Mustache template = findTemplate();
@@ -36,26 +42,58 @@ public class ComicCompiler {
             if (image == null) continue;
 
             String href = String.format("page-%d.xhtml", screen.getIndex());
-            book.addSection(
-                    String.format("Page %d", screen.getIndex()),
-                    new Resource(buildPage(screen, template), href)
-            );
+
+            Content content = book.addContent(pageBytes(screen, template),
+                    "text/html",
+                    href,
+                    true, true);
+            content.setId(String.format("Page %d", screen.getIndex() + 1));
+            content.setLinear(true);
 
             for (Frame frame : screen.getFrames()) {
                 String frame_ref = String.format("page-%d-%d.xhtml", screen.getIndex(), frame.getId());
-                book.addSection(
-                        String.format("Page %d.%d", screen.getIndex(), frame.getId()),
-                        new Resource(buildPage(screen, frame, template), frame_ref)
-                );
+                book.addContent(
+                        pageBytes(screen, frame, template),
+                        "text/html",
+                        frame_ref,
+                        false, true)
+                .setId(String.format("Page %d Frame %d", screen.getIndex() + 1, frame.getId()));
             }
         }
 
-        EpubWriter epubWriter = new EpubWriter();
-        Path out = targetDir.toPath().resolve("book.epub");
-        epubWriter.write(book, new FileOutputStream(out.toFile()));
+        saveToFile(book);
     }
 
-    private Reader buildPage(Screen screen, Frame frame, Mustache template) {
+    private void saveToFile(EpubBook book) {
+        EpubWriter writer = new EpubWriter();
+        writer.setTocCreator(this::createHiddenToc);
+
+        Path out = targetDir.toPath().resolve("book.epub");
+        try {
+            writer.writeEpubToStream(book, new FileOutputStream(out.toFile()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Content createHiddenToc(EpubBook book) {
+        Content toc = new TocCreatorDefault().createTocFromBook(book);
+        String old = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(toc.getContent())).toString();
+        String hidden = old.replace("<ol>", "<ol hidden=''>");
+        toc.setContent(hidden.getBytes(StandardCharsets.UTF_8));
+        return toc;
+    }
+
+    private byte[] pageBytes(Screen screen, Mustache template) {
+        StringWriter writer = new StringWriter();
+        HashMap<String, Object> scope = pageScope(screen, this.comic);
+
+        template.execute(writer, scope);
+
+        return writer.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private byte[] pageBytes(Screen screen, Frame frame, Mustache template) {
         File image = screen.getImage();
         String stem = FilenameUtils.getBaseName(image.getName());
         String ext = FilenameUtils.getExtension(image.getName());
@@ -67,17 +105,7 @@ public class ComicCompiler {
         scope.put("image", String.format("screens/%s.%d.%s", stem, frame.getId(), ext));
 
         template.execute(writer, scope);
-
-        return new StringReader(writer.toString());
-    }
-
-    private Reader buildPage(Screen screen, Mustache template) {
-        StringWriter writer = new StringWriter();
-        HashMap<String, Object> scope = pageScope(screen, this.comic);
-
-        template.execute(writer, scope);
-
-        return new StringReader(writer.toString());
+        return writer.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private HashMap<String, Object> pageScope(Screen screen, Comic comic) {
@@ -85,7 +113,7 @@ public class ComicCompiler {
         String stem = FilenameUtils.getBaseName(image.getName());
         String ext = FilenameUtils.getExtension(image.getName());
 
-        HashMap<String, Object> scope = new HashMap();
+        HashMap<String, Object> scope = new HashMap<>();
 
         scope.put("title", comic.getTitle());
         scope.put("image", String.format("screens/%s.%s", stem, ext));
@@ -105,9 +133,7 @@ public class ComicCompiler {
         }
     }
 
-    private void addBookImages(Book book) throws IOException {
-        Resources res = book.getResources();
-
+    private void addBookImages(EpubBook book) throws IOException {
         for (Screen screen: comic.getScreens()) {
             File image = screen.getImage();
             if (image == null) continue;
@@ -115,35 +141,68 @@ public class ComicCompiler {
             String stem = FilenameUtils.getBaseName(image.getName());
             String ext = FilenameUtils.getExtension(image.getName());
 
-            res.add(
-                    new Resource(
-                            new FileInputStream(screen.getImage()),
-                            String.format("screens/%s.%s", stem, ext)
-                    )
-            );
+            book.addContent(new FileInputStream(screen.getImage()),
+                    mime(ext), String.format("screens/%s.%s", stem, ext),
+                    false, false)
+            .setId(stem);
 
             for (Frame frame : screen.getFrames()) {
                 String href = String.format("screens/%s.%d.%s", stem, frame.getId(), ext);
                 String frameFilename = frameFilename(screen, frame);
                 Path path = clipPath(frameFilename);
-                res.add(new Resource(new FileInputStream(path.toFile()), href));
+                book.addContent(new FileInputStream(path.toFile()),
+                        mime(ext), href, false, false)
+                .setId(String.format("%s.%d", stem, frame.getId()));
             }
         }
     }
 
-    private void buildBookMetadata(Metadata metadata) {
-        metadata.setTitles(List.of(comic.getTitle()));
-        metadata.setDescriptions(List.of(comic.description.get()));
-        // This works for a single author. For a list, consider splitting and using setAuthors
-        metadata.addAuthor(new Author(comic.author.get()));
-        // Same here: single illustrator
-        Author illustrator = new Author(comic.illustrator.get());
-        illustrator.setRole("art");
-        metadata.addAuthor(illustrator);
-        metadata.addPublisher(comic.publisher.get());
-        metadata.addIdentifier(new Identifier(Identifier.Scheme.ISBN, comic.isbn.get()));
-        metadata.setRights(List.of(comic.rights.get()));
-        metadata.addDate(new Date(comic.publicationDate.get(), Date.Event.PUBLICATION));
+    private String mime(String ext) {
+        switch (ext) {
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            default:
+                return "application/octet-stream";
+        }
+    }
+
+    private void setMetadata(EpubBook book) {
+        book.setLanguage(comic.getLanguage());
+        book.setTitle(comic.getTitle());
+        // There is a limited set of built-in metadata available. Everything else
+        // must be constructed manually
+
+        // Author is straightforward; could also use setAuthor.
+        book.addMetadata(builder()
+            .name("dc:creator")
+            .id("author")
+            .value(comic.getAuthor()));
+
+        // Illustrator is a dc:creator tag followed by a <meta> tag updating role
+        book.addMetadata(builder()
+            .name("dc:creator")
+            .id("illustrator")
+            .value(comic.getIllustrator()));
+        book.addMetadata(builder()
+            .name("meta")
+            .property("role")
+            .refines("#illustrator")
+            .value("art"));
+
+        book.addMetadata(builder().name("dc:description").value(comic.getDescription()));
+        book.addMetadata(builder().name("dc:publisher").value(comic.getPublisher()));
+        book.addMetadata(builder().name("dc:date").value(comic.publicationDate.get()));
+        book.addMetadata(builder().name("dc:rights").value(comic.getRights()));
+
+        book.setId(comic.getISBN());
+        book.addMetadata(builder()
+                .name("meta")
+                .property("scheme")
+                .refines("#uid")
+                .value("ISBN"));
     }
 
     private Path clipPath(String frameFilename) {

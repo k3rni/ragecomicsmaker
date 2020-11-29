@@ -22,12 +22,10 @@ public class MetadataController {
     }
 
     private PropertyEditor<?> selectPropertyEditor(PropertySheet.Item item) {
-        switch (item.getName()) {
-            case "Description":
-                return createTextareaEditor(item);
-            default:
-                return Editors.createTextEditor(item);
+        if ("Description".equals(item.getName())) {
+            return createTextareaEditor(item);
         }
+        return Editors.createTextEditor(item);
     }
 
     public void setComic(Comic comic) {
@@ -38,15 +36,15 @@ public class MetadataController {
     private ObservableList<PropertySheet.Item> getPropertyItems(SimpleObjectProperty<Comic> comicProp) {
         Comic com = comic.get();
         ObservableList<PropertySheet.Item> props = FXCollections.observableArrayList();
-        props.add(new StringProp("Title", com.title) {});
-        StringProp desc = new StringProp("Description", com.description);
-        props.add(desc);
-        props.add(new StringProp("Author", com.author));
-        props.add(new StringProp("Illustrator", com.illustrator));
-        props.add(new StringProp("ISBN", com.isbn));
-        props.add(new StringProp("Publisher", com.publisher));
-        props.add(new StringProp("Publication Date", com.publicationDate, "Format: YYYY, YYYY-MM or YYYY-MM-DD"));
-       props.add(new StringProp<>("Copyright", com.rights));
+        props.add(new StringProp<>("Title", com.title) {});
+        props.add(new StringProp<>("Description", com.description));
+        props.add(new StringProp<>("Author", com.author));
+        props.add(new StringProp<>("Illustrator", com.illustrator));
+        props.add(new StringProp<>("ISBN", com.isbn));
+        props.add(new StringProp<>("Publisher", com.publisher));
+        props.add(new StringProp<>("Publication Date", com.publicationDate, "Format: YYYY, YYYY-MM or YYYY-MM-DD"));
+        props.add(new StringProp<>("Copyright", com.rights));
+        props.add(new StringProp<>("Language", com.language));
         return props;
     }
 
@@ -57,7 +55,7 @@ public class MetadataController {
 
             @Override
             protected ObservableValue<String> getObservableValue() {
-                return (ObservableValue<String>) this.getProperty().getObservableValue().get();
+                return (ObservableValue<String>) this.getProperty().getObservableValue().orElse(null);
             }
 
             @Override

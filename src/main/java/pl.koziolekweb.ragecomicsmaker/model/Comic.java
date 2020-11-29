@@ -11,8 +11,6 @@ import javafx.beans.property.StringProperty;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 
-import java.beans.BeanProperty;
-import java.beans.JavaBean;
 import java.io.File;
 import java.io.Serializable;
 import java.util.*;
@@ -64,6 +62,8 @@ public class Comic implements Serializable {
 	public StringProperty isbn  = new SimpleStringProperty("");
 	@JsonIgnore
 	public StringProperty rights  = new SimpleStringProperty("");
+	@JsonIgnore
+	public StringProperty language = new SimpleStringProperty("");
 
 	public Comic() {
 		initDefaults();
@@ -153,6 +153,14 @@ public class Comic implements Serializable {
 	@JsonProperty
 	public String getDescription() { return this.description.get(); }
 	public void setDescription(String description) { this.description.set(description); }
+
+	@JsonProperty
+	public String getISBN() { return this.isbn.get(); }
+	public void setISBN(String isbn) { this.isbn.set(isbn); }
+
+	@JsonProperty
+	public String getLanguage() { return this.language.get(); }
+	public void setLanguage(String language) { this.language.set(language); }
 
 	public Direction getDirection() {
 		return direction;

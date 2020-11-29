@@ -9,12 +9,14 @@ module pl.koziolekweb.ragecomismaker {
     requires com.fasterxml.jackson.dataformat.xml;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
-    requires commons.io;
     requires com.google.common;
     requires thumbnailator;
-    requires xmlpull;
+    requires com.github.mustachejava;
+    requires org.apache.commons.io;
+    requires epub.creator;
 
-    exports pl.koziolekweb.ragecomicsmaker;
+    opens pl.koziolekweb.ragecomicsmaker;
+    opens pl.koziolekweb.ragecomicsmaker.model to com.fasterxml.jackson.databind;
     opens pl.koziolekweb.ragecomicsmaker.gui;
 
 }
