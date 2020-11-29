@@ -24,6 +24,7 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;

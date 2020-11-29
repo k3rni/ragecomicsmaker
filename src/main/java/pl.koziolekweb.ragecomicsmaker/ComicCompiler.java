@@ -3,11 +3,16 @@ package pl.koziolekweb.ragecomicsmaker;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import com.google.common.collect.Lists;
+import coza.opencollab.epub.creator.api.MetadataItem;
+import coza.opencollab.epub.creator.api.OpfCreator;
+import coza.opencollab.epub.creator.impl.OpfCreatorDefault;
 import coza.opencollab.epub.creator.impl.TocCreatorDefault;
 import coza.opencollab.epub.creator.model.Content;
 import coza.opencollab.epub.creator.model.EpubBook;
 import coza.opencollab.epub.creator.util.EpubWriter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
@@ -17,7 +22,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import static coza.opencollab.epub.creator.api.MetadataItem.builder;
 
@@ -32,8 +39,10 @@ public class ComicCompiler {
     public void save() throws IOException {
         EpubBook book = new EpubBook();
 
-        setMetadata(book);
+        setBasicMetadata(book);
+        Collection<MetadataItem> metadata = extraMetadata();
         addBookImages(book);
+        addCover(book);
 
         Mustache template = findTemplate();
 
@@ -61,11 +70,15 @@ public class ComicCompiler {
             }
         }
 
-        saveToFile(book);
+        saveToFile(book, metadata);
     }
 
-    private void saveToFile(EpubBook book) {
+    private void saveToFile(EpubBook book, Collection<MetadataItem> metadataItems) {
         EpubWriter writer = new EpubWriter();
+        OpfCreator opf = new OpfCreatorDefault();
+        for (MetadataItem m : metadataItems) opf.addMetadata(m);
+
+        writer.setOpfCreator(opf);
         writer.setTocCreator(this::createHiddenToc);
 
         Path out = targetDir.toPath().resolve("book.epub");
@@ -141,10 +154,10 @@ public class ComicCompiler {
             String stem = FilenameUtils.getBaseName(image.getName());
             String ext = FilenameUtils.getExtension(image.getName());
 
-            book.addContent(new FileInputStream(screen.getImage()),
+            Content content = book.addContent(new FileInputStream(screen.getImage()),
                     mime(ext), String.format("screens/%s.%s", stem, ext),
-                    false, false)
-            .setId(stem);
+                    false, false);
+            content.setId(stem);
 
             for (Frame frame : screen.getFrames()) {
                 String href = String.format("screens/%s.%d.%s", stem, frame.getId(), ext);
@@ -155,6 +168,28 @@ public class ComicCompiler {
                 .setId(String.format("%s.%d", stem, frame.getId()));
             }
         }
+    }
+
+    private void addCover(EpubBook book) throws IOException {
+        Path cover = targetDir.toPath().resolve("cover.jpg");
+        File coverImage = cover.toFile();
+
+
+        if (coverImage.canRead()) {
+            addCoverFrom(book, coverImage, "image/jpeg");
+            return;
+        }
+
+        cover = targetDir.toPath().resolve("cover.png");
+        coverImage = cover.toFile();
+        if (coverImage.canRead()) {
+            addCoverFrom(book, coverImage, "image/png");
+            return;
+        }
+    }
+
+    private void addCoverFrom(EpubBook book, File image, String mime) throws IOException {
+        book.addCoverImage(IOUtils.toByteArray(new FileInputStream(image)), mime, image.getName());
     }
 
     private String mime(String ext) {
@@ -169,40 +204,51 @@ public class ComicCompiler {
         }
     }
 
-    private void setMetadata(EpubBook book) {
+    private void setBasicMetadata(EpubBook book) {
+        // Required by epubcreator, exact content not relevant
+        book.setId(comic.getTitle());
+
         book.setLanguage(comic.getLanguage());
         book.setTitle(comic.getTitle());
         // There is a limited set of built-in metadata available. Everything else
         // must be constructed manually
+    }
 
+    private Collection<MetadataItem> extraMetadata() {
+        List<MetadataItem> meta = Lists.newArrayList();
         // Author is straightforward; could also use setAuthor.
-        book.addMetadata(builder()
+        meta.add(builder()
             .name("dc:creator")
             .id("author")
             .value(comic.getAuthor()));
 
         // Illustrator is a dc:creator tag followed by a <meta> tag updating role
-        book.addMetadata(builder()
+        meta.add(builder()
             .name("dc:creator")
             .id("illustrator")
             .value(comic.getIllustrator()));
-        book.addMetadata(builder()
+        meta.add(builder()
             .name("meta")
             .property("role")
             .refines("#illustrator")
             .value("art"));
 
-        book.addMetadata(builder().name("dc:description").value(comic.getDescription()));
-        book.addMetadata(builder().name("dc:publisher").value(comic.getPublisher()));
-        book.addMetadata(builder().name("dc:date").value(comic.publicationDate.get()));
-        book.addMetadata(builder().name("dc:rights").value(comic.getRights()));
+        meta.add(builder().name("dc:description").value(comic.getDescription()));
+        meta.add(builder().name("dc:publisher").value(comic.getPublisher()));
+        meta.add(builder().name("dc:date").value(comic.publicationDate.get()));
+        meta.add(builder().name("dc:rights").value(comic.getRights()));
 
-        book.setId(comic.getISBN());
-        book.addMetadata(builder()
+        meta.add(builder()
+            .name("dc:identifier")
+            .id("isbn")
+            .value(comic.getISBN()));
+        meta.add(builder()
                 .name("meta")
                 .property("scheme")
-                .refines("#uid")
+                .refines("#isbn")
                 .value("ISBN"));
+
+        return meta;
     }
 
     private Path clipPath(String frameFilename) {
