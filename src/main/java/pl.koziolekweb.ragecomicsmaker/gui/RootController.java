@@ -3,6 +3,7 @@ package pl.koziolekweb.ragecomicsmaker.gui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.collect.Streams;
+import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +13,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.controlsfx.control.Notifications;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.ComicCompiler;
@@ -24,7 +27,6 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,7 +85,8 @@ public class RootController {
         try {
             return mapper.readValue(xml.toFile(), Comic.class);
         } catch (IOException e) {
-            // TODO: pop an error message
+            App.EVENT_BUS.post(new ErrorEvent("Looks like comic.xml is corrupted. Consider replacing it with one of the backups", null));
+            App.EVENT_BUS.post(new ErrorEvent(e.getMessage(), null));
             e.printStackTrace();
         }
         return null;
@@ -147,13 +150,9 @@ public class RootController {
     void save() {
         try {
             new SaveCommand(this.comic, this.targetDir.toFile()).save();
-            Notifications
-                    .create()
-                    .title("Success")
-                    .text("Saved comic definition")
-                    .showInformation();
+            infoPopup("Success", "Saved comic definition XML");
         } catch (IOException e) {
-            showError(e);
+            errorPopup(e);
 
         }
     }
@@ -162,13 +161,9 @@ public class RootController {
     void generateBook() {
         try {
             new ComicCompiler(targetDir.toFile(), comic).save();
-            Notifications
-                    .create()
-                    .title("Success")
-                    .text("Comic saved as `book.epub`")
-                    .showInformation();
+            infoPopup("Success", "Comic saved as `book.eupb`");
         } catch (IOException e) {
-            showError(e);
+            errorPopup(e);
         }
     }
 
@@ -203,12 +198,36 @@ public class RootController {
         touchUI();
     }
 
-    void showError(Exception e) {
-        e.printStackTrace();
+    @Subscribe
+    private void onErrorEvent(ErrorEvent err) {
+        if (err.t != null)
+            Platform.runLater(() -> errorPopup(err.t));
+        else
+            Platform.runLater(() -> errorPopup("Error", err.message));
+    }
+
+    void infoPopup(String title, String message) {
+        Window window = leftPane.getScene().getWindow();
         Notifications
                 .create()
-                .title("Error")
-                .text(e.getMessage())
+                .owner(window)
+                .title(title)
+                .text(message)
+                .showInformation();
+    }
+
+    void errorPopup(String title, String message) {
+        Window window = leftPane.getScene().getWindow();
+        Notifications
+                .create()
+                .owner(window)
+                .title(title)
+                .text(message)
                 .showError();
+    }
+
+    void errorPopup(Throwable e) {
+        e.printStackTrace();
+        errorPopup("Exception", e.getMessage());
     }
 }

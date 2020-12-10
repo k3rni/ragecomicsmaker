@@ -30,8 +30,6 @@ public class Comic implements Serializable {
 	@JacksonXmlProperty(isAttribute = true)
 	private String id;
 
-	@JsonIgnore
-	public StringProperty title = new SimpleStringProperty("");
 
 	@JacksonXmlProperty(isAttribute = true)
 	private Direction direction;
@@ -48,6 +46,8 @@ public class Comic implements Serializable {
 	@JsonProperty(value = "screen") // Applies to elements of this set
 	private TreeSet<Screen> screens = new TreeSet<>();
 
+	@JsonIgnore
+	public StringProperty title = new SimpleStringProperty("");
 	@JsonIgnore
 	public StringProperty description = new SimpleStringProperty("");
 	@JsonIgnore

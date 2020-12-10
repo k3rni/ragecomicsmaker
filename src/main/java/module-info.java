@@ -9,6 +9,8 @@ module pl.koziolekweb.ragecomismaker {
     requires com.fasterxml.jackson.dataformat.xml;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
+    requires org.codehaus.stax2;
+    requires com.ctc.wstx;
     requires com.google.common;
     requires thumbnailator;
     requires com.github.mustachejava;
