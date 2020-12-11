@@ -49,7 +49,7 @@ dependencies {
 
 mainClassName = 'pl.koziolekweb.ragecomicsmaker.App'
 group = 'pl.koziolekweb.ragecomicsmaker'
-version = '2.2.0'
+version = '2.2.1'
 description = 'ragecomicsmaker'
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
