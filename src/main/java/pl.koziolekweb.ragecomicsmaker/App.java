@@ -26,6 +26,7 @@ public class App extends Application implements ErrorEventListener {
 		primaryStage.setTitle("RCM");
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));
+		primaryStage.setMaximized(true);
 		primaryStage.show();
 	}
 

@@ -36,7 +36,7 @@ public class RootController {
     @FXML public SplitPane leftPane;
 
     @FXML MetadataController metadataTabController;
-    @FXML FrameEditorController editorTabController;
+    @FXML ImageEditorController editorTabController;
     @FXML LeftPaneController leftPaneController;
 
     Path targetDir;
@@ -196,6 +196,8 @@ public class RootController {
 
     private void onFramesReordered(Object o) {
         touchUI();
+        // Set screen again so editor replaces frames
+        editorTabController.showEditor(currentScreen);
     }
 
     @Subscribe
