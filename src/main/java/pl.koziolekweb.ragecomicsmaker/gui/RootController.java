@@ -56,12 +56,14 @@ public class RootController {
         spring.setMaxWidth(Integer.MAX_VALUE);
 
         editorTabController.newFrameCallback = this::onNewFrame;
+        editorTabController.highlightFrame.bind(leftPaneController.hoverFrameProperty);
 
         leftPaneController.screenSelectedCallback = this::onScreenSelected;
         leftPaneController.framesReorderedCallback = this::onFramesReordered;
 
         this.screens = FXCollections.observableArrayList();
         leftPaneController.bindScreens(screens);
+
     }
 
     void loadComic() {
@@ -173,31 +175,23 @@ public class RootController {
         System.out.println(e);
     }
 
-    private void touchUI() {
-        editorTabController.touchUI();
-        leftPaneController.touchUI(null);
-    }
-
-
     private void onScreenSelected(Screen newValue) {
         if (newValue == null) return;
         currentScreen = newValue;
         editorTabController.showEditor(currentScreen);
-        // NOTE: not reactive. Must also be redrawn when handling events
-        Set<Frame> frames = currentScreen.getFrames();
-        Platform.runLater(() -> leftPaneController.updateFrameControls(frames));
     }
 
     private void onNewFrame(Frame frame) {
-        touchUI();
+        // TODO: update in leftpanecontroller
         Set<Frame> frames = currentScreen.getFrames();
-        Platform.runLater(() -> leftPaneController.updateFrameControls(frames));
+        leftPaneController.framesProperty.setAll(frames);
     }
 
     private void onFramesReordered(Object o) {
-        touchUI();
         // Set screen again so editor replaces frames
         editorTabController.showEditor(currentScreen);
+        // And set frame list directly
+        leftPaneController.framesProperty.setAll(currentScreen.getFrames());
     }
 
     @Subscribe

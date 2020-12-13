@@ -1,5 +1,6 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -32,6 +33,7 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -52,6 +54,7 @@ public class ImageEditorController {
     private SimpleDoubleProperty zoomProperty = new SimpleDoubleProperty(1.0);
     private SimpleObjectProperty<Point3D> dragOriginProperty = new SimpleObjectProperty<>();
     private SimpleObjectProperty<Point3D> dragFinishProperty = new SimpleObjectProperty<>();
+    public SimpleObjectProperty<Frame> highlightFrame = new SimpleObjectProperty<>();
 
 
     public void initialize() {
@@ -92,6 +95,7 @@ public class ImageEditorController {
 
         screenProperty.addListener(this::onScreenChanged);
         framesProperty.addListener(this::onFramesChanged);
+        highlightFrame.addListener(this::highlightFrameChanged);
 
         zoomProperty.addListener(this::onZoomChanged);
 
@@ -112,6 +116,14 @@ public class ImageEditorController {
         double step = scrollEvent.getDeltaY() / 100.0;
         // Clamp zoom to a range
         zoomProperty.set(Math.max(0.5, Math.min(4.0, zoomProperty.get()) + step));
+
+        /*
+        TODO: calculate scroll offset so that pointer x,y which corresponded to scaled location px, py
+        Platform.runLater(() -> {
+            scrollPane.setHvalue(...);
+            scrollPane.setVvalue(...);
+        });
+        */
 
         // Eat the event, hiding it from the ScrollPane
         scrollEvent.consume();
@@ -225,13 +237,23 @@ public class ImageEditorController {
 
     private void onFramesChanged(ListChangeListener.Change<? extends Frame> change) {
         // Triggered by showEditor, whenever frames are added/removed/reordered
+        createVisualFrames((List<Frame>) change.getList());
+    }
+
+    private void highlightFrameChanged(ObservableValue<? extends Frame> observable, Frame oldValue, Frame newValue) {
+        createVisualFrames(framesProperty);
+    }
+
+    private void createVisualFrames(List<Frame> newFrames) {
         ObservableList<Node> frames = framesContainer.getChildren();
-        frames.clear();
 
         frames.setAll(
-          change.getList().stream()
-                  .flatMap((Frame f) -> Stream.of(buildFrameRect(f), buildFrameText(f)))
-                .collect(Collectors.toSet())
+                Stream.concat(
+                    // TODO: Sort the highlightedFrame last
+                    newFrames.stream().map((Frame f) -> buildFrameRect(f)),
+                    // Numbers on top
+                    newFrames.stream().map((Frame f) -> buildFrameText(f))
+                ).collect(Collectors.toUnmodifiableList())
         );
     }
 
@@ -251,9 +273,16 @@ public class ImageEditorController {
         // Draw frame around selected area
         Rectangle r = new Rectangle();
         r.setBlendMode(BlendMode.SRC_ATOP);
-        r.setFill(Color.gray(0.4, 0.5));
+        if (f == highlightFrame.get()) {
+            // Chartreuse
+            r.setFill(new Color(0.49803922f, 1.0f, 0.0f, 0.5).brighter());
+            r.setStroke(new Color(0.49803922f, 1.0f, 0.0f, 1.0));
+        } else {
+            r.setFill(Color.gray(0.4, 0.5));
+            r.setStroke(Color.BLACK);
+        }
         r.getStrokeDashArray().setAll(0.5, 0.5);
-        r.setStroke(Color.BLACK);
+
         r.widthProperty().bind(imgWidthProperty.multiply(f.getSizeX()));
         r.heightProperty().bind(imgHeightProperty.multiply(f.getSizeY()));
         r.xProperty().bind(imgWidthProperty.multiply(f.getStartX()));
