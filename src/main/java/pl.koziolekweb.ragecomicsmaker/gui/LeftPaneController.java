@@ -1,9 +1,9 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -16,9 +16,11 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import net.coobird.thumbnailator.Thumbnailator;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.GlyphFont;
+import org.controlsfx.glyphfont.GlyphFontRegistry;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
@@ -33,16 +35,18 @@ public class LeftPaneController {
     @FXML public ListView<Frame> framesList;
 
     public Consumer<Screen> screenSelectedCallback;
-    public Consumer<Object> framesReorderedCallback;
+    public Consumer<List<Frame>> framesReorderedCallback;
 
     SimpleObjectProperty<ObservableList<Screen>> screenListProperty = new SimpleObjectProperty<>(FXCollections.observableArrayList());
     SimpleObjectProperty<Screen> screenProperty = new SimpleObjectProperty<>();
     ObservableList<Frame> framesProperty = FXCollections.observableArrayList();
+
     public SimpleObjectProperty<Frame> hoverFrameProperty = new SimpleObjectProperty<>();
 
     private boolean setupDone = false;
     
     private WeakHashMap<Frame, Image> frameThumbnails = new WeakHashMap<>();
+    GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
 
     @FXML
     void initialize() {
@@ -75,32 +79,39 @@ public class LeftPaneController {
         filePane.itemsProperty().bind(screenListProperty);
         filePane.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        this.screenProperty.bind(filePane.getSelectionModel().selectedItemProperty());
-        this.screenProperty.addListener(this::onScreenSelected);
+        screenProperty.bind(filePane.getSelectionModel().selectedItemProperty());
+        screenProperty.addListener(this::onScreenSelected);
     }
 
     private void setupFramesPane() {
-        framesList.setCellFactory((frame) -> {
-            ListCell<Frame> c = new ListCell<>() {
-                @Override
-                protected void updateItem(Frame item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(null);
-                    if (item == null || empty) setGraphic(null);
-                    else setGraphic(createFrameNode(item));
-                }
-            };
-            c.setOnMouseEntered((e) -> trackFrameListMouse(c, e));
-            c.setOnMouseExited((e) -> trackFrameListMouse(null, e));
-            return c;
-        });
+        framesList.setCellFactory((frame) -> new FrameListCell(
+                this::trackFrameListMouse,
+                this::createFrameNode,
+                this::xxReorder));
 
-        this.framesProperty.addListener((ListChangeListener<Frame>) c -> {
-            framesList.setItems((ObservableList<Frame>) c.getList());
+        framesProperty.addListener((ListChangeListener<? super Frame>) change -> {
+            System.out.println(this);
+            System.out.println(change);
+            framesReorderedCallback.accept(framesProperty);
         });
     }
 
-    public void trackFrameListMouse(ListCell<Frame> f, MouseEvent e) {
+    public void nextScreen() {
+        // Called by key handling code in RootController. Advance to next screen if possible
+        filePane.getSelectionModel().selectNext();
+    }
+
+    public void previousScreen() {
+        // Called by key handling code in RootController. Go to previous screen if possible
+        filePane.getSelectionModel().selectPrevious();
+    }
+
+    private void xxReorder(List<Frame> frames) {
+        // Frame list did something to its items that require updating framesProperty
+        framesProperty.setAll(frames);
+    }
+
+    public void trackFrameListMouse(ListCell<Frame> f) {
         if (f == null)
             hoverFrameProperty.set(null);
         else
@@ -112,12 +123,13 @@ public class LeftPaneController {
     }
 
     public void touchUI(Set<Frame> frames) {
-        this.framesProperty.setAll(frames);
+        framesProperty.setAll(frames);
     }
 
     private void onScreenSelected(Observable observable, Screen oldScreen, Screen newScreen) {
         screenSelectedCallback.accept(newScreen);
         framesProperty.setAll(newScreen.getFrames());
+        framesList.setItems(framesProperty.sorted());
     }
 
     URL frameControlFXML = getClass().getResource("/frame-controls.fxml");
@@ -135,6 +147,8 @@ public class LeftPaneController {
             label.setText(frame.getLabel());
             ImageView img = (ImageView) n.lookup("#image");
             img.setImage(lookupImageFor(screenProperty.get(), frame));
+            Button btn = (Button) n.lookup("#delete");
+            btn.setGraphic(fontAwesome.create(FontAwesome.Glyph.CLOSE));
             return box;
         } catch (IOException e) {
             e.printStackTrace();
@@ -157,31 +171,13 @@ public class LeftPaneController {
         }
     }
 
-    // NOTE: don't have to be on this controller, could be a different object
-    @FXML
-    void reorderUp(ActionEvent e) {
-        Screen currentScreen = screenProperty.get();
-        Frame f = hoverFrameProperty.get();
-        currentScreen.moveFrameUp(f);
-        touchUI(currentScreen.getFrames());
-        framesReorderedCallback.accept(f);
-    }
-
-    @FXML
-    void reorderDown(ActionEvent e) {
-        Screen currentScreen = screenProperty.get();
-        Frame f = hoverFrameProperty.get();
-        currentScreen.moveFrameDown(f);
-        touchUI(currentScreen.getFrames());
-        framesReorderedCallback.accept(f);
-    }
-
     @FXML
     void deleteFrame(Event e) {
         Screen currentScreen = screenProperty.get();
         Frame f = hoverFrameProperty.get();
         currentScreen.removeFrame(f);
         touchUI(currentScreen.getFrames());
-        framesReorderedCallback.accept(f);
+        // TODO
+//        framesReorderedCallback.accept(f);
     }
 }

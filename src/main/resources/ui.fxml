@@ -8,15 +8,16 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.glyphfont.Glyph?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyTyped="#onKeyTyped" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.koziolekweb.ragecomicsmaker.gui.RootController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressed" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.koziolekweb.ragecomicsmaker.gui.RootController">
   <children>
       <ToolBar prefHeight="40.0" VBox.vgrow="NEVER">
         <items>
-          <Button fx:id="browseBtn" mnemonicParsing="false" onAction="#showDirectoryDialog" styleClass="success" text="Open Directory" />
-            <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#save" text="Save" />
+            <Button fx:id="browseBtn" mnemonicParsing="false" onAction="#showDirectoryDialog" styleClass="success" text="Open Directory" />
+            <Button fx:id="saveBtn" disable="true" mnemonicParsing="false" onAction="#save" text="Save" />
             <Region fx:id="spring" maxWidth="999.0" minWidth="-Infinity" prefWidth="320.0" />
-            <Button fx:id="generateBtn" alignment="CENTER" mnemonicParsing="false" onAction="#generateBook" styleClass="primary" text="Generate book">
+            <Button fx:id="generateBtn" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#generateBook" styleClass="primary" text="Generate book">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets></Button>
@@ -25,7 +26,7 @@
       <SplitPane dividerPositions="0.0" VBox.vgrow="ALWAYS">
          <items>
              <fx:include fx:id="leftPane" source="left-pane.fxml" />
-            <TabPane>
+            <TabPane fx:id="tabPane">
                <tabs>
                   <Tab closable="false" text="Frame Editor">
                      <content>

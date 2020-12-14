@@ -14,7 +14,7 @@
       <ImageView fx:id="image" fitHeight="96.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
    </left>
    <center>
-      <Label id="label" fx:id="label" prefWidth="1.0" style="-fx-background-color: #ff0;" text="9" BorderPane.alignment="CENTER" HBox.hgrow="NEVER">
+      <Label id="label" fx:id="label" prefWidth="1.0" text="9" BorderPane.alignment="CENTER" HBox.hgrow="NEVER">
          <HBox.margin>
             <Insets left="8.0" />
          </HBox.margin>
@@ -23,30 +23,12 @@
          </font></Label>
    </center>
    <right>
-      <HBox>
-         <Button id="up" mnemonicParsing="false" onAction="#reorderUp" prefHeight="90.0" text="▲">
-            <cursor>
-               <Cursor fx:constant="DEFAULT" />
-            </cursor>
-            <font>
-               <Font size="16.0" />
-            </font></Button>
-         <Button id="down" mnemonicParsing="false" onAction="#reorderDown" prefHeight="90.0" text="▼">
-            <cursor>
-               <Cursor fx:constant="DEFAULT" />
-            </cursor>
-            <font>
-               <Font size="16.0" />
-            </font></Button>
-         <Button id="delete" mnemonicParsing="false" onAction="#deleteFrame" prefHeight="90.0" text="⨯">
-            <cursor>
-               <Cursor fx:constant="DEFAULT" />
-            </cursor>
+         <!-- No text on this button - but icon is set after loading -->
+         <Button id="delete" mnemonicParsing="false" onAction="#deleteFrame" prefHeight="90.0" text="">
             <font>
                <Font size="16.0" />
             </font>
          </Button>
-      </HBox>
    </right>
    <opaqueInsets>
       <Insets bottom="8.0" />
