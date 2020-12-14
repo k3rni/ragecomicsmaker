@@ -11,8 +11,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
@@ -27,6 +27,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -73,8 +74,9 @@ public class ImageEditorController {
 
         // Handle window resize events, send to resize image appropriately
         // These also invoke resizing behavior for framesContainer
-        scrollPane.widthProperty().addListener((observableValue, oldValue, newValue) -> imageDisplay.setFitWidth(newValue.doubleValue()));
-        scrollPane.heightProperty().addListener((observable, oldValue, newValue) -> imageDisplay.setFitHeight(newValue.doubleValue()));
+        scrollPane.widthProperty().addListener(this::scrollWidthChanged);
+        scrollPane.heightProperty().addListener(this::scrollHeightChanged);
+
 
         // Wheel event must attach to canvas, which is over the image
         frameCanvas.setOnScroll(this::onScroll);
@@ -117,19 +119,22 @@ public class ImageEditorController {
 
         double step = scrollEvent.getDeltaY() / 100.0;
         // Clamp zoom to a range
-        zoomProperty.set(Math.max(0.5, Math.min(4.0, zoomProperty.get()) + step));
+        double z = Math.max(0.5, Math.min(zoomProperty.doubleValue() + step, 4.0));
+        zoomProperty.set(z);
 
-        /*
-        TODO: calculate scroll offset so that pointer x,y which corresponded to scaled location px, py
-        Platform.runLater(() -> {
-            scrollPane.setHvalue(...);
-            scrollPane.setVvalue(...);
-        });
-        */
-
-        // Eat the event, hiding it from the ScrollPane
+            // Eat the event, hiding it from the ScrollPane
         scrollEvent.consume();
     }
+
+
+    /* Reference: https://stackoverflow.com/questions/41535624/javafx-8-how-to-get-center-location-of-scrollpanes-viewport
+       During a zoom event, we know the cursor x,y relative to image
+       This can give us scaled offsets (0..1) X,Y
+       Next, we know that the image size will be z*W : z*H after zoom; and our cursor will land on
+       x/z, y/z (or X/z,Y/z scaled) in the new image.
+       dx, dy = x*z - x, y*z - y = x*(z-1), y*(z-1) is how many pixels we need to scroll after zoom
+       add to hvalue, vvalue ???
+    */
 
     private void onZoomChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         Image image = imageDisplay.getImage();
@@ -251,7 +256,6 @@ public class ImageEditorController {
 
         frames.setAll(
                 Stream.concat(
-                    // TODO: Sort the highlightedFrame last
                     newFrames.stream().map((Frame f) -> buildFrameRect(f)),
                     // Numbers on top
                     newFrames.stream().map((Frame f) -> buildFrameText(f))
@@ -261,12 +265,7 @@ public class ImageEditorController {
 
     private Node buildFrameText(Frame f) {
         // Display frame number
-
-        Text t = new Text(String.format("%d", f.getId()));
-        t.setTextOrigin(VPos.BOTTOM);
-        t.setFont(Font.font("sans-serif", FontWeight.BLACK, 32.0));
-        t.setFill(Color.YELLOW);
-        t.setStroke(Color.BLACK);
+        Text t = Visuals.buildFrameText(f);
         t.xProperty().bind(imgWidthProperty.multiply(f.getStartX()));
         t.yProperty().bind(imgHeightProperty.multiply(f.getStartY() + f.getSizeY()));
         return t;
@@ -274,18 +273,7 @@ public class ImageEditorController {
 
     private Node buildFrameRect(Frame f) {
         // Draw frame around selected area
-        Rectangle r = new Rectangle();
-        r.setBlendMode(BlendMode.SRC_ATOP);
-        if (f == highlightFrame.get()) {
-            // Chartreuse
-            r.setFill(new Color(0.49803922f, 1.0f, 0.0f, 0.5).brighter());
-            r.setStroke(new Color(0.49803922f, 1.0f, 0.0f, 1.0));
-        } else {
-            r.setFill(Color.gray(0.4, 0.5));
-            r.setStroke(Color.BLACK);
-        }
-        r.getStrokeDashArray().setAll(0.5, 0.5);
-
+        Rectangle r = Visuals.buildFrameRect(f, f == highlightFrame.get());
         r.widthProperty().bind(imgWidthProperty.multiply(f.getSizeX()));
         r.heightProperty().bind(imgHeightProperty.multiply(f.getSizeY()));
         r.xProperty().bind(imgWidthProperty.multiply(f.getStartX()));
@@ -296,5 +284,13 @@ public class ImageEditorController {
     @Deprecated
     public void touchUI() {
 
+    }
+
+    private void scrollWidthChanged(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+        imageDisplay.setFitWidth(newValue.doubleValue());
+    }
+
+    private void scrollHeightChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        imageDisplay.setFitHeight(newValue.doubleValue());
     }
 }
