@@ -180,23 +180,11 @@ public class ImageEditorController {
         if (newValue == null) return;
         if (screenProperty.get() == null) return;
 
-        Point3D start = dragOriginProperty.get();
-        Point3D end = newValue;
+        Visuals.drawNewSelection(frameCanvas, dragOriginProperty.get(), newValue);
+    }
 
-        System.out.println(start.distance(end));
-        GraphicsContext gc = frameCanvas.getGraphicsContext2D();
-
-        gc.clearRect(0, 0, frameCanvas.getWidth(), frameCanvas.getHeight());
-
-        gc.setStroke(new Color(0.8627451f, 0.078431375f, 0.23529412f, 1.0).brighter()); // Crimson
-        gc.setFill(new Color(0.8627451f, 0.078431375f, 0.23529412f, 0.5));
-
-        double width = Math.abs(end.getX() - start.getX());
-        double height = Math.abs(end.getY() - start.getY());
-        double left = Math.min(start.getX(), end.getX());
-        double top = Math.min(start.getY(), end.getY());
-        gc.fillRect(left, top, width, height);
-        gc.strokeRect(left, top, width, height);
+    private double clamp(double min, double v, double max) {
+        return Math.min(max, Math.max(min, v));
     }
 
     private void createNewFrame() {
@@ -206,10 +194,16 @@ public class ImageEditorController {
         double imgWidth = imgWidthProperty.get();
         double imgHeight = imgHeightProperty.get();
 
-        double width = Math.abs(end.getX() - start.getX());
-        double height = Math.abs(end.getY() - start.getY());
-        double left = Math.min(start.getX(), end.getX());
-        double top = Math.min(start.getY(), end.getY());
+        double sy = clamp(0, start.getY(), imgHeight);
+        double ey = clamp(0, end.getY(), imgHeight);
+        double sx = clamp(0, start.getX(), imgWidth);
+        double ex = clamp(0, end.getX(), imgWidth);
+
+        double top = Math.min(sy, ey);
+        double left = Math.min(sx, ex);
+
+        double width = Math.abs(ex - sx);
+        double height = Math.abs(ey - sy);
 
         // TODO: Return if rectangle is too small
 
@@ -279,11 +273,6 @@ public class ImageEditorController {
         r.xProperty().bind(imgWidthProperty.multiply(f.getStartX()));
         r.yProperty().bind(imgHeightProperty.multiply(f.getStartY()));
         return r;
-    }
-
-    @Deprecated
-    public void touchUI() {
-
     }
 
     private void scrollWidthChanged(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {

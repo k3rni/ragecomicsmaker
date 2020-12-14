@@ -2,17 +2,10 @@ package pl.koziolekweb.ragecomicsmaker;
 
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.Glyph;
-import org.controlsfx.glyphfont.GlyphFont;
-import org.controlsfx.glyphfont.GlyphFontRegistry;
-import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
-import pl.koziolekweb.ragecomicsmaker.event.ErrorEventListener;
 
 
 /**

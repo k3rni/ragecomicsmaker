@@ -1,24 +1,21 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.google.common.collect.Streams;
 import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.Stylesheet;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.controlsfx.control.Notifications;
 import org.controlsfx.glyphfont.FontAwesome;
@@ -26,19 +23,17 @@ import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
 import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.ComicCompiler;
-import pl.koziolekweb.ragecomicsmaker.event.DirSelectedEvent;
-import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
+import pl.koziolekweb.ragecomicsmaker.LoadCommand;
 import pl.koziolekweb.ragecomicsmaker.SaveCommand;
+import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class RootController {
     @FXML public Region spring;
@@ -86,93 +81,20 @@ public class RootController {
 
         this.screens = FXCollections.observableArrayList();
         leftPaneController.bindScreens(screens);
-
     }
 
-    void loadComic() {
-        Path xml = targetDir.resolve("comic.xml");
-        if (!xml.toFile().canRead()) {
-            this.comic = new Comic();
-            saveBtn.setDisable(false);
-            generateBtn.setDisable(false);
-            comic.initDefaults();
-            loadScreens();
-        } else {
-            this.comic = loadComicXml(xml);
-            saveBtn.setDisable(false);
-            generateBtn.setDisable(false);
-            verifyScreens();
-        }
-
-        this.screens.setAll(comic.getScreens());
-        this.metadataTabController.setComic(comic);
-    }
-
-
-    private Comic loadComicXml(Path xml) {
-        ObjectMapper mapper = new XmlMapper();
-        try {
-            return mapper.readValue(xml.toFile(), Comic.class);
-        } catch (IOException e) {
-            App.EVENT_BUS.post(new ErrorEvent("Looks like comic.xml is corrupted. Consider replacing it with one of the backups", null));
-            App.EVENT_BUS.post(new ErrorEvent(e.getMessage(), null));
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    void loadScreens() {
-        List<File> images = getImages(Optional.empty());
-        Collections.sort(images);
-        final String white = "#FFFFFF";
-        Streams.mapWithIndex(images.stream(),
-                (file, index) -> new Screen(file, white, index))
-                .forEach(comic::addScreen);
-    }
-
-    void verifyScreens() {
-        String pattern = comic.getImages().getNamePattern();
-        List<File> images;
-
-        if (pattern == null || pattern.isBlank())
-            images = getImages(Optional.empty());
-        else
-            images = getImages(Optional.of(pattern));
-
-        Collections.sort(images); // ?
-
-        if (images.size() != comic.getScreens().size()) {
-            // TODO: pop a warning message
-            App.EVENT_BUS.post(new ErrorEvent("Screen count differs from saved version", null));
-        }
-    }
-
-    List<File> getImages(Optional<String> namePattern) {
-        final String digits = "[0-9]+";
-        final String extPattern = "(jpg|png)";
-
-        if (targetDir == null)
-            return Collections.emptyList();
-
-        String pattern = namePattern.orElse("screen")
-                .split("@")[0] +
-                digits + "\\." + extPattern;
-
-        File dir = targetDir.toFile();
-        return Arrays.stream(
-                dir.listFiles((pathname ->
-                        pathname.getName().matches(pattern))))
-                .collect(Collectors.toList());
-    }
 
     @FXML
-    void showDirectoryDialog(Event e) {
+    void showDirectoryDialog(Event ev) {
         File dir = new DirectoryChooser().showDialog(null);
         if (dir == null) return;
 
         this.targetDir = dir.toPath();
-        loadComic();
-        App.EVENT_BUS.post(new DirSelectedEvent(dir));
+        this.comic = new LoadCommand(dir.toPath()).load();
+        this.screens.setAll(comic.getScreens());
+        this.metadataTabController.setComic(comic);
+        saveBtn.setDisable(false);
+        generateBtn.setDisable(false);
     }
 
     @FXML
@@ -182,15 +104,15 @@ public class RootController {
             infoPopup("Success", "Saved comic definition XML");
         } catch (IOException e) {
             errorPopup(e);
-
         }
     }
 
     @FXML
     void generateBook() {
         try {
+            // TODO: filename from title?
             new ComicCompiler(targetDir.toFile(), comic).save();
-            infoPopup("Success", "Comic saved as `book.eupb`");
+            infoPopup("Success", "Comic saved as `book.epub`");
         } catch (IOException e) {
             errorPopup(e);
         }
@@ -262,7 +184,7 @@ public class RootController {
         Window window = leftPane.getScene().getWindow();
         Notifications
                 .create()
-                .owner(window)
+                .owner(null)
                 .title(title)
                 .text(message)
                 .showInformation();
@@ -272,7 +194,7 @@ public class RootController {
         Window window = leftPane.getScene().getWindow();
         Notifications
                 .create()
-                .owner(window)
+                .owner(null)
                 .title(title)
                 .text(message)
                 .showError();
