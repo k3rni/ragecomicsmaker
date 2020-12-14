@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.Buffer;
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -59,6 +60,11 @@ public class Screen implements Serializable, Comparable<Screen> {
 
 	public void addFrame(Frame frame) {
 		frames.add(frame);
+	}
+
+	public void setFrames(Collection<Frame> newFrames) {
+		frames.clear();
+		frames.addAll(newFrames);
 	}
 
 	public long getIndex() {
