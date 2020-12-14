@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -27,6 +28,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
@@ -150,6 +152,7 @@ public class ImageEditorController {
     private void onMouseReleased(MouseEvent e) {
         // End a drag-rectangle gesture
         if (e.getButton() != MouseButton.PRIMARY) return;
+        if (screenProperty.get() == null) return;
 
         createNewFrame();
         dragOriginProperty.set(null);
@@ -161,9 +164,7 @@ public class ImageEditorController {
 
     private void onDragMovement(MouseEvent e) {
         // While dragging, update finish point. This is then painted by appropriate listeners.
-        System.out.print("Moved ");
-        System.out.println(e);
-
+        if (screenProperty.get() == null) return;
         if (!e.isPrimaryButtonDown()) return;
 
         dragFinishProperty.set(e.getPickResult().getIntersectedPoint());
@@ -172,6 +173,7 @@ public class ImageEditorController {
     private void onDragProgress(ObservableValue<? extends Point3D> observable, Point3D oldValue, Point3D newValue) {
         // Draw rectangle between current start and finish points.
         if (newValue == null) return;
+        if (screenProperty.get() == null) return;
 
         Point3D start = dragOriginProperty.get();
         Point3D end = newValue;
@@ -184,34 +186,34 @@ public class ImageEditorController {
         gc.setStroke(new Color(0.8627451f, 0.078431375f, 0.23529412f, 1.0).brighter()); // Crimson
         gc.setFill(new Color(0.8627451f, 0.078431375f, 0.23529412f, 0.5));
 
-        // TODO: rearrange coords when not dragging topleft to bottomright
-        double width = end.getX() - start.getX();
-        double height = end.getY() - start.getY();
-        gc.strokeRect(start.getX(), start.getY(), width, height);
-        gc.fillRect(start.getX() + 1, start.getY() + 1, width - 2, height - 2);
+        double width = Math.abs(end.getX() - start.getX());
+        double height = Math.abs(end.getY() - start.getY());
+        double left = Math.min(start.getX(), end.getX());
+        double top = Math.min(start.getY(), end.getY());
+        gc.fillRect(left, top, width, height);
+        gc.strokeRect(left, top, width, height);
     }
 
     private void createNewFrame() {
-        // TODO: rearrange coords when not dragging topleft to bottomright
         Point3D start = dragOriginProperty.get();
         Point3D end = dragFinishProperty.get();
 
         double imgWidth = imgWidthProperty.get();
         double imgHeight = imgHeightProperty.get();
 
-        double x = start.getX() / imgWidth;
-        double y = start.getY() / imgHeight;
-        double w = (end.getX() - start.getX()) / imgWidth;
-        double h = (end.getY() - start.getY()) / imgHeight;
+        double width = Math.abs(end.getX() - start.getX());
+        double height = Math.abs(end.getY() - start.getY());
+        double left = Math.min(start.getX(), end.getX());
+        double top = Math.min(start.getY(), end.getY());
 
         // TODO: Return if rectangle is too small
 
         Screen screen = screenProperty.get();
         Frame frame = new Frame(screen.getScreenSize());
-        frame.setStartX(x);
-        frame.setStartY(y);
-        frame.setSizeX(w);
-        frame.setSizeY(h);
+        frame.setStartX(left / imgWidth);
+        frame.setStartY(top / imgHeight);
+        frame.setSizeX(width / imgWidth);
+        frame.setSizeY(height / imgHeight);
         frame.setTransitionDuration(1);
         screen.addFrame(frame);
         showEditor(screen);
@@ -259,9 +261,10 @@ public class ImageEditorController {
 
     private Node buildFrameText(Frame f) {
         // Display frame number
+
         Text t = new Text(String.format("%d", f.getId()));
         t.setTextOrigin(VPos.BOTTOM);
-        t.setFont(Font.font("sans-serif", 32.0));
+        t.setFont(Font.font("sans-serif", FontWeight.BLACK, 32.0));
         t.setFill(Color.YELLOW);
         t.setStroke(Color.BLACK);
         t.xProperty().bind(imgWidthProperty.multiply(f.getStartX()));
