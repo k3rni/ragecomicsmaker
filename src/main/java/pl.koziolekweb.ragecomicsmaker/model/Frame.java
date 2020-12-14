@@ -4,7 +4,6 @@ import java.util.Locale;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Collections2.transform;
-import static com.google.common.collect.ComparisonChain.start;
 import static java.util.Arrays.asList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -163,9 +162,10 @@ public class Frame implements Comparable<Frame> {
 
 	@Override
 	public int compareTo(Frame that) {
-		if (that == null)
-			return 1;
-		return start().compare(this.id, that.id).result();
+		if (that == null) return 1;
+		if (this.id < that.id) return -1;
+		else if (this.id == that.id) return 0;
+		else return 1;
 	}
 
 	@JsonIgnore
