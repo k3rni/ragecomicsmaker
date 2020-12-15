@@ -1,6 +1,5 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -10,13 +9,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -25,11 +21,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
@@ -37,6 +29,7 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -84,6 +77,7 @@ public class ImageEditorController {
         frameCanvas.setOnMousePressed(this::onMousePressed);
         frameCanvas.setOnMouseDragged(this::onDragMovement);
         frameCanvas.setOnMouseReleased(this::onMouseReleased);
+//        frameCanvas.setOnMouseClicked(this::onMouseClick);
 
         // Handle when image bounds change (on user zoom or window resize auto-fit)
         imageDisplay.boundsInParentProperty().addListener(this::onImageResize);
@@ -113,13 +107,26 @@ public class ImageEditorController {
         this.imgHeightProperty.set(newBounds.getHeight());
     }
 
+    public void fit() {
+        // Reset zoom and fit
+        zoomProperty.set(0d);
+    }
+
     private void onScroll(ScrollEvent scrollEvent) {
         // Handle mousewheel events
         if (!scrollEvent.isControlDown()) return;
 
-        double step = scrollEvent.getDeltaY() / 100.0;
+        double step = scrollEvent.getDeltaY() / 400.0;
+
         // Clamp zoom to a range
-        double z = Math.max(0.5, Math.min(zoomProperty.doubleValue() + step, 4.0));
+        double z = zoomProperty.doubleValue();
+
+        if (Math.abs(z) < 0.01)
+            z = Math.min(stack.getWidth() / imageDisplay.getImage().getWidth(),
+                         stack.getHeight() / imageDisplay.getImage().getHeight());
+
+        z = Math.max(0.5, Math.min(z + step, 4.0));
+
         zoomProperty.set(z);
 
             // Eat the event, hiding it from the ScrollPane
@@ -135,15 +142,29 @@ public class ImageEditorController {
        dx, dy = x*z - x, y*z - y = x*(z-1), y*(z-1) is how many pixels we need to scroll after zoom
        add to hvalue, vvalue ???
     */
+    private void onMouseClick(MouseEvent e) {
+        System.out.println(String.format("HValue %f/%f VValue %f/%f", scrollPane.getHvalue(), scrollPane.getHmax(),
+                scrollPane.getVvalue(), scrollPane.getVmax()));
+        System.out.println(scrollPane.getViewportBounds());
+        double h = e.getX() / imageDisplay.getBoundsInParent().getWidth();
+        scrollPane.setHvalue(h);
+        e.consume();
+    }
 
     private void onZoomChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         Image image = imageDisplay.getImage();
         double zoom = zoomProperty.get();
+        System.out.println(zoom);
 
         // These cannot be bound to image.widthProperty.multiply() because we set them explicitly
         // when handling scrollpane's resize events
-        imageDisplay.setFitWidth(image.getWidth() * zoom);
-        imageDisplay.setFitHeight(image.getHeight() * zoom);
+        if (Math.abs(zoom) < 0.01) { // Don't compare floats exactly
+            imageDisplay.setFitWidth(scrollPane.getWidth());
+            imageDisplay.setFitHeight(scrollPane.getHeight());
+        } else {
+            imageDisplay.setFitWidth(image.getWidth() * zoom);
+            imageDisplay.setFitHeight(image.getHeight() * zoom);
+        }
     }
 
 
@@ -159,7 +180,20 @@ public class ImageEditorController {
         if (e.getButton() != MouseButton.PRIMARY) return;
         if (screenProperty.get() == null) return;
 
-        createNewFrame();
+        double imgWidth = imgWidthProperty.get();
+        double imgHeight = imgHeightProperty.get();
+        Point3D start = dragOriginProperty.get();
+        Point3D end = dragFinishProperty.get();
+        Screen screen = screenProperty.get();
+
+        Optional.ofNullable(createNewFrame(screen, start, end, imgWidth, imgHeight))
+                .ifPresent(newFrame -> {
+                    screen.addFrame(newFrame);
+                    showEditor(screen);
+                    // Propagate up
+                    newFrameCallback.accept(newFrame);
+                });
+
         dragOriginProperty.set(null);
         dragFinishProperty.set(null);
 
@@ -187,13 +221,8 @@ public class ImageEditorController {
         return Math.min(max, Math.max(min, v));
     }
 
-    private void createNewFrame() {
-        Point3D start = dragOriginProperty.get();
-        Point3D end = dragFinishProperty.get();
-
-        double imgWidth = imgWidthProperty.get();
-        double imgHeight = imgHeightProperty.get();
-
+    private Frame createNewFrame(Screen screen, Point3D start, Point3D end, double imgWidth, double imgHeight) {
+        if (end == null) return null;
         double sy = clamp(0, start.getY(), imgHeight);
         double ey = clamp(0, end.getY(), imgHeight);
         double sx = clamp(0, start.getX(), imgWidth);
@@ -205,20 +234,14 @@ public class ImageEditorController {
         double width = Math.abs(ex - sx);
         double height = Math.abs(ey - sy);
 
-        // TODO: Return if rectangle is too small
-
-        Screen screen = screenProperty.get();
+        // TODO: Return null if rectangle is too small
         Frame frame = new Frame(screen.getScreenSize());
         frame.setStartX(left / imgWidth);
         frame.setStartY(top / imgHeight);
         frame.setSizeX(width / imgWidth);
         frame.setSizeY(height / imgHeight);
         frame.setTransitionDuration(1);
-        screen.addFrame(frame);
-        showEditor(screen);
-
-        // Propagate up
-        newFrameCallback.accept(frame);
+        return frame;
     }
 
     public void showEditor(Screen screen) {
@@ -246,14 +269,15 @@ public class ImageEditorController {
     }
 
     private void createVisualFrames(List<Frame> newFrames) {
-        ObservableList<Node> frames = framesContainer.getChildren();
-
-        frames.setAll(
-                Stream.concat(
-                    newFrames.stream().map((Frame f) -> buildFrameRect(f)),
-                    // Numbers on top
-                    newFrames.stream().map((Frame f) -> buildFrameText(f))
-                ).collect(Collectors.toUnmodifiableList())
+        framesContainer.getChildren().setAll(
+                Stream.of(
+                        // All frames but the highlighted one
+                        newFrames.stream().filter(f -> f != highlightFrame.get()).map(this::buildFrameRect),
+                        // Highlighted frame goes on top of every other one
+                        newFrames.stream().filter(f -> f == highlightFrame.get()).map(this::buildFrameRect),
+                        // Numbers last
+                        newFrames.stream().map(this::buildFrameText)
+                ).flatMap(frame -> frame).collect(Collectors.toUnmodifiableList())
         );
     }
 

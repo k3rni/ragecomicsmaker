@@ -59,7 +59,6 @@ public class RootController {
     @FXML
     void initialize() {
         App.EVENT_BUS.register(this);
-        App.EVENT_BUS.register(editorTabController); // to receive AddFrameEvent
 
         // No easy way to set this from fxml
         saveBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.SAVE));
@@ -135,6 +134,9 @@ public class RootController {
         } else if (e.getCode() == KeyCode.F2) {
             tabPane.getSelectionModel().select(1);
             e.consume();
+        } else if (e.getCode() == KeyCode.ENTER) {
+            editorTabController.fit();
+            e.consume();
         } else if (e.getCode() == KeyCode.PAGE_UP) {
             leftPaneController.previousScreen();
             e.consume();
@@ -181,7 +183,6 @@ public class RootController {
     }
 
     void infoPopup(String title, String message) {
-        Window window = leftPane.getScene().getWindow();
         Notifications
                 .create()
                 .owner(null)
@@ -191,7 +192,6 @@ public class RootController {
     }
 
     void errorPopup(String title, String message) {
-        Window window = leftPane.getScene().getWindow();
         Notifications
                 .create()
                 .owner(null)
