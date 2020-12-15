@@ -3,12 +3,10 @@ package pl.koziolekweb.ragecomicsmaker.gui;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
 import net.coobird.thumbnailator.Thumbnailator;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
@@ -27,7 +25,9 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 public class LeftPaneController {
@@ -72,7 +72,7 @@ public class LeftPaneController {
                     setGraphic(null);
                 } else {
                     setText(item.getLabel());
-                    setGraphic(null); // TODO: a thumbnail?
+                    setGraphic(fontAwesome.create(FontAwesome.Glyph.FILE_IMAGE_ALT));
                 }
             }
         });
