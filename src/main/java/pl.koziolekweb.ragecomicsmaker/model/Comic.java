@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -57,6 +59,8 @@ public class Comic implements Serializable {
 	public StringProperty rights  = new SimpleStringProperty("");
 	@JsonIgnore
 	public StringProperty language = new SimpleStringProperty("");
+	@JsonIgnore
+	public BooleanProperty insertFullPages = new SimpleBooleanProperty(true);
 
 	public Comic() {
 		initDefaults();
@@ -163,6 +167,13 @@ public class Comic implements Serializable {
 	public String getLanguage() { return this.language.get(); }
 	@SuppressWarnings("unused")
 	public void setLanguage(String language) { this.language.set(language); }
+
+	@JsonProperty
+	@JacksonXmlProperty(isAttribute = true, localName = "full-pages")
+	public boolean getInsertFullPages() { return this.insertFullPages.get(); }
+	@SuppressWarnings("unused")
+	public void setInsertFullPages(boolean value) { this.insertFullPages.set(value); }
+
 
 	public Direction getDirection() {
 		return direction;

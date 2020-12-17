@@ -50,14 +50,16 @@ public class ComicCompiler {
             File image = screen.getImage();
             if (image == null) continue;
 
-            String href = String.format("page-%d.xhtml", screen.getIndex());
+            if (comic.getInsertFullPages()) {
+                String href = String.format("page-%d.xhtml", screen.getIndex());
 
-            Content content = book.addContent(pageBytes(screen, template),
-                    "text/html",
-                    href,
-                    true, true);
-            content.setId(String.format("Page %d", screen.getIndex() + 1));
-            content.setLinear(true);
+                Content content = book.addContent(pageBytes(screen, template),
+                        "text/html",
+                        href,
+                        true, true);
+                content.setId(String.format("Page %d", screen.getIndex() + 1));
+                content.setLinear(true);
+            }
 
             for (Frame frame : screen.getFrames()) {
                 String frame_ref = String.format("page-%d-%d.xhtml", screen.getIndex(), frame.getId());

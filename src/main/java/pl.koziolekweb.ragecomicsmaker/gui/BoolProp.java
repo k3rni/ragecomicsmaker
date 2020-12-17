@@ -1,30 +1,40 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import org.controlsfx.control.PropertySheet;
 
 import java.util.Optional;
 
-class StringProp<P extends StringProperty> implements PropertySheet.Item {
-    private String category = null;
+public class BoolProp<P extends BooleanProperty> implements PropertySheet.Item {
+    private String category;
     private String description = null;
     private String name;
     P underlyingProperty;
 
-    public StringProp(String name, P prop) {
+    public BoolProp(String name, P prop) {
         this.name = name;
         this.underlyingProperty = prop;
     }
 
-    public StringProp(String name, P prop, String description) {
+    public BoolProp(String name, P prop, String description) {
         this(name, prop);
         this.description = description;
     }
 
-    public StringProp(String name, P prop, String description, String category) {
+    public BoolProp(String name, P prop, String description, String category) {
         this(name, prop, description);
         this.category = category;
+    }
+
+    @Override
+    public Class<?> getType() {
+        return Boolean.class;
+    }
+
+    @Override
+    public String getCategory() {
+        return this.category;
     }
 
     @Override
@@ -44,22 +54,11 @@ class StringProp<P extends StringProperty> implements PropertySheet.Item {
 
     @Override
     public void setValue(Object value) {
-        underlyingProperty.set((String) value);
-    }
-
-    @Override
-    public Class<?> getType() {
-        return String.class;
+        underlyingProperty.set((Boolean) value);
     }
 
     @Override
     public Optional<ObservableValue<? extends Object>> getObservableValue() {
         return Optional.of(underlyingProperty);
     }
-
-    @Override
-    public String getCategory() {
-        return this.category;
-    }
 }
-

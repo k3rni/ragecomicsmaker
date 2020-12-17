@@ -22,10 +22,14 @@ public class MetadataController {
     }
 
     private PropertyEditor<?> selectPropertyEditor(PropertySheet.Item item) {
-        if ("Description".equals(item.getName())) {
-            return createTextareaEditor(item);
+        if (item.getType() == Boolean.class)
+            return Editors.createCheckEditor(item);
+        switch (item.getName()) {
+            case "Description":
+                return createTextareaEditor(item);
+            default:
+                return Editors.createTextEditor(item);
         }
-        return Editors.createTextEditor(item);
     }
 
     public void setComic(Comic comic) {
@@ -35,16 +39,22 @@ public class MetadataController {
 
     private ObservableList<PropertySheet.Item> getPropertyItems(SimpleObjectProperty<Comic> comicProp) {
         Comic com = comic.get();
+        final String OUTPUT = "Output preferences";
+        final String BOOK = "E-book metadata";
         ObservableList<PropertySheet.Item> props = FXCollections.observableArrayList();
-        props.add(new StringProp<>("Title", com.title) {});
-        props.add(new StringProp<>("Description", com.description));
-        props.add(new StringProp<>("Author", com.author));
-        props.add(new StringProp<>("Illustrator", com.illustrator));
-        props.add(new StringProp<>("ISBN", com.isbn));
-        props.add(new StringProp<>("Publisher", com.publisher));
-        props.add(new StringProp<>("Publication Date", com.publicationDate, "Format: YYYY, YYYY-MM or YYYY-MM-DD"));
-        props.add(new StringProp<>("Copyright", com.rights));
-        props.add(new StringProp<>("Language", com.language));
+        props.add(new StringProp<>("Title", com.title, "Primary title", BOOK) {});
+        props.add(new StringProp<>("Description", com.description, "Description or blurb", BOOK));
+        props.add(new StringProp<>("Author", com.author, "Primary author", BOOK));
+        props.add(new StringProp<>("Illustrator", com.illustrator, "Primary illustrator", BOOK));
+        props.add(new StringProp<>("ISBN", com.isbn, "ISBN/ISSN number", BOOK));
+        props.add(new StringProp<>("Publisher", com.publisher, "", BOOK));
+        props.add(new StringProp<>("Publication Date", com.publicationDate,
+                "Format: YYYY, YYYY-MM or YYYY-MM-DD", BOOK));
+        props.add(new StringProp<>("Copyright", com.rights, "Copyright year(s) and owner(s)", BOOK));
+        props.add(new StringProp<>("Language", com.language, "Two-letter code", BOOK));
+        props.add(new BoolProp<>("Full pages", com.insertFullPages,
+                "Insert full page image before any clips of that page.",
+                OUTPUT));
         return props;
     }
 
