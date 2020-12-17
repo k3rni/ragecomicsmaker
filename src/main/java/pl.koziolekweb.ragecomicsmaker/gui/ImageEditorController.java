@@ -1,5 +1,6 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -28,8 +29,10 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
+import java.util.Timer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,7 +50,7 @@ public class ImageEditorController {
     private SimpleDoubleProperty imgHeightProperty = new SimpleDoubleProperty();
     private SimpleObjectProperty<Screen> screenProperty = new SimpleObjectProperty<>();
     private ObservableList<Frame> framesProperty = FXCollections.observableArrayList();
-    private SimpleDoubleProperty zoomProperty = new SimpleDoubleProperty(1.0);
+    private SimpleDoubleProperty zoomProperty = new SimpleDoubleProperty(0d);
     private SimpleObjectProperty<Point3D> dragOriginProperty = new SimpleObjectProperty<>();
     private SimpleObjectProperty<Point3D> dragFinishProperty = new SimpleObjectProperty<>();
     public SimpleObjectProperty<Frame> highlightFrame = new SimpleObjectProperty<>();
@@ -77,7 +80,7 @@ public class ImageEditorController {
         frameCanvas.setOnMousePressed(this::onMousePressed);
         frameCanvas.setOnMouseDragged(this::onDragMovement);
         frameCanvas.setOnMouseReleased(this::onMouseReleased);
-//        frameCanvas.setOnMouseClicked(this::onMouseClick);
+        frameCanvas.setOnMouseClicked(this::onMouseClick);
 
         // Handle when image bounds change (on user zoom or window resize auto-fit)
         imageDisplay.boundsInParentProperty().addListener(this::onImageResize);
@@ -116,20 +119,27 @@ public class ImageEditorController {
         // Handle mousewheel events
         if (!scrollEvent.isControlDown()) return;
 
-        double step = scrollEvent.getDeltaY() / 400.0;
-
-        // Clamp zoom to a range
+        double step = Math.sqrt(2.0);
         double z = zoomProperty.doubleValue();
 
-        if (Math.abs(z) < 0.01)
+        if (Math.abs(z) < 0.01) {
+            // Zero means fit-to-screen. But it needs to be converted to an actual zoom value.
             z = Math.min(stack.getWidth() / imageDisplay.getImage().getWidth(),
                          stack.getHeight() / imageDisplay.getImage().getHeight());
+        }
+        double z0 = z;
 
-        z = Math.max(0.5, Math.min(z + step, 4.0));
+        if (scrollEvent.getDeltaY() < 0)
+            z /= step;
+        else if (scrollEvent.getDeltaY() > 0)
+            z *= step;
+
+        // Clamp zoom to a range
+        z = Math.max(0.5, Math.min(z, 4.0));
 
         zoomProperty.set(z);
 
-            // Eat the event, hiding it from the ScrollPane
+        // Eat the event, hiding it from the ScrollPane
         scrollEvent.consume();
     }
 
@@ -143,8 +153,8 @@ public class ImageEditorController {
        add to hvalue, vvalue ???
     */
     private void onMouseClick(MouseEvent e) {
-        System.out.println(String.format("HValue %f/%f VValue %f/%f", scrollPane.getHvalue(), scrollPane.getHmax(),
-                scrollPane.getVvalue(), scrollPane.getVmax()));
+        System.out.printf("HValue %f/%f VValue %f/%f%n", scrollPane.getHvalue(), scrollPane.getHmax(),
+                scrollPane.getVvalue(), scrollPane.getVmax());
         System.out.println(scrollPane.getViewportBounds());
         double h = e.getX() / imageDisplay.getBoundsInParent().getWidth();
         scrollPane.setHvalue(h);
@@ -154,7 +164,6 @@ public class ImageEditorController {
     private void onZoomChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         Image image = imageDisplay.getImage();
         double zoom = zoomProperty.get();
-        System.out.println(zoom);
 
         // These cannot be bound to image.widthProperty.multiply() because we set them explicitly
         // when handling scrollpane's resize events
