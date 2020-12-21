@@ -43,6 +43,8 @@ public class RootController {
     @FXML MetadataController metadataTabController;
     @FXML ImageEditorController editorTabController;
     @FXML LeftPaneController leftPaneController;
+    @FXML TemplateEditorController templateTabController;
+    @FXML StylesheetEditorController stylesheetTabController;
     @FXML Button saveBtn;
     @FXML Button generateBtn;
 
@@ -91,6 +93,8 @@ public class RootController {
         this.comic = new LoadCommand(dir.toPath()).load();
         this.screens.setAll(comic.getScreens());
         this.metadataTabController.setComic(comic);
+        templateTabController.onComicLoaded(targetDir);
+        stylesheetTabController.onComicLoaded(targetDir);
         saveBtn.setDisable(false);
         generateBtn.setDisable(false);
     }
@@ -108,9 +112,8 @@ public class RootController {
     @FXML
     void generateBook() {
         try {
-            // TODO: filename from title?
-            new ComicCompiler(targetDir.toFile(), comic).save();
-            infoPopup("Success", "Comic saved as `book.epub`");
+            Path result = new ComicCompiler(targetDir.toFile(), comic).save();
+            infoPopup("Success", String.format("Comic saved as `%s`", result.getFileName()));
         } catch (IOException e) {
             errorPopup(e);
         }
