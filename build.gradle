@@ -32,9 +32,11 @@ dependencies {
     implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.0-rc5'
     // Template language used for XHTML file generation
     implementation 'com.github.spullara.mustache.java:compiler:0.9.7'
-    implementation 'org.fxmisc.easybind:easybind:1.0.3'
+    // Generates frame thumbnails
     implementation 'net.coobird:thumbnailator:0.4.13'
 
+    // UI and controls
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation 'org.openjfx:javafx-controls:11.0.3'
     implementation 'org.openjfx:javafx-fxml:11.0.3'
     implementation 'org.openjfx:javafx-graphics:11.0.3'

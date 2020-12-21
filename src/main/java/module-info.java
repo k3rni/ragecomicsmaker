@@ -5,6 +5,7 @@ module pl.koziolekweb.ragecomismaker {
     requires javafx.controls;
     requires javafx.swing;
     requires org.controlsfx.controls;
+    requires org.fxmisc.richtext;
 
     requires com.fasterxml.jackson.dataformat.xml;
     requires com.fasterxml.jackson.annotation;
