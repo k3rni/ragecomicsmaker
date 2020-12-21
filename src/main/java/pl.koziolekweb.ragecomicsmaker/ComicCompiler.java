@@ -122,7 +122,7 @@ public class ComicCompiler {
             return mf.compile(new FileReader(path.toFile()), "page.xhtml");
         } catch (FileNotFoundException fnf) {
             // No page template in comic directory. Use default one
-            InputStream s = getClass().getResourceAsStream("page.xhtml");
+            InputStream s = getClass().getResourceAsStream("/page.xhtml");
             return mf.compile(new InputStreamReader(s),"page.xhtml");
         }
     }
