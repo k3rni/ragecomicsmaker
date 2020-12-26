@@ -1,14 +1,18 @@
 package pl.koziolekweb.ragecomicsmaker.model;
 
-import java.util.Locale;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Collections2.transform;
-import static java.util.Arrays.asList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import javafx.geometry.Point3D;
+
+import java.util.Locale;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Collections2.transform;
+import static java.lang.Math.min;
+import static java.util.Arrays.asList;
+import static pl.koziolekweb.ragecomicsmaker.MathUtil.clamp;
 
 /**
  * TODO write JAVADOC!!!
@@ -37,8 +41,34 @@ public class Frame implements Comparable<Frame> {
 	@JsonIgnore
 	private boolean visibility = true;
 
+	// Must exist for Jackson to create Frame objects
 	public Frame() {
-		//
+	}
+
+	public static Frame createNewFrame(int frameId, Point3D start, Point3D end, double imgWidth, double imgHeight) {
+		if (end == null) return null;
+
+		double sy = clamp(0, start.getY(), imgHeight);
+		double ey = clamp(0, end.getY(), imgHeight);
+		double sx = clamp(0, start.getX(), imgWidth);
+		double ex = clamp(0, end.getX(), imgWidth);
+
+		if (sx / imgWidth < 0.05 || sy / imgHeight < 0.05)
+			return null;
+
+		double top = min(sy, ey);
+		double left = min(sx, ex);
+
+		double width = Math.abs(ex - sx);
+		double height = Math.abs(ey - sy);
+
+		Frame frame = new Frame(frameId);
+		frame.setStartX(left / imgWidth);
+		frame.setStartY(top / imgHeight);
+		frame.setSizeX(width / imgWidth);
+		frame.setSizeY(height / imgHeight);
+		frame.setTransitionDuration(1);
+		return frame;
 	}
 
 	public Frame(int id) {

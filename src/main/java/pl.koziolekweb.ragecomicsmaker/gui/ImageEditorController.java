@@ -39,8 +39,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static pl.koziolekweb.ragecomicsmaker.MathUtil.clamp;
 import static pl.koziolekweb.ragecomicsmaker.gui.ZoomToCursor.scrollOffsets;
 import static pl.koziolekweb.ragecomicsmaker.gui.ZoomToCursor.zoomPivot;
 
@@ -224,9 +224,7 @@ public class ImageEditorController implements FrameManager {
                 stack.getHeight() / image.getHeight());
     }
 
-    private double clamp(double min, double v, double max) {
-        return min(max, max(min, v));
-    }
+
 
     public void showEditor(Screen screen) {
         // Called by rootController.
@@ -308,38 +306,12 @@ public class ImageEditorController implements FrameManager {
         Screen screen = screenProperty.get();
         int frameId = screen.getFrameCount();
 
-        Optional.ofNullable(createNewFrame(frameId, start, end, imgWidth, imgHeight))
+        Optional.ofNullable(Frame.createNewFrame(frameId, start, end, imgWidth, imgHeight))
                 .ifPresent(newFrame -> {
                     screen.addFrame(newFrame);
                     showEditor(screen);
                     // Propagate to parent controller
                     newFrameCallback.accept(newFrame);
                 });
-    }
-
-    private Frame createNewFrame(int frameId, Point3D start, Point3D end, double imgWidth, double imgHeight) {
-        if (end == null) return null;
-
-        double sy = clamp(0, start.getY(), imgHeight);
-        double ey = clamp(0, end.getY(), imgHeight);
-        double sx = clamp(0, start.getX(), imgWidth);
-        double ex = clamp(0, end.getX(), imgWidth);
-
-        if (sx / imgWidth < 0.05 || sy / imgHeight < 0.05)
-            return null;
-
-        double top = min(sy, ey);
-        double left = min(sx, ex);
-
-        double width = Math.abs(ex - sx);
-        double height = Math.abs(ey - sy);
-
-        Frame frame = new Frame(frameId);
-        frame.setStartX(left / imgWidth);
-        frame.setStartY(top / imgHeight);
-        frame.setSizeX(width / imgWidth);
-        frame.setSizeY(height / imgHeight);
-        frame.setTransitionDuration(1);
-        return frame;
     }
 }
