@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.Buffer;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -154,7 +153,7 @@ public class Screen implements Serializable, Comparable<Screen> {
 	}
 
 	@JsonIgnore
-	public int getScreenSize() {
+	public int getFrameCount() {
 		return getFrames().size();
 	}
 

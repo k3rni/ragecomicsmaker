@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import org.apache.commons.io.IOUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import pl.koziolekweb.ragecomicsmaker.model.Snippet;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,7 +24,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static pl.koziolekweb.ragecomicsmaker.gui.Snippet.loadSnippet;
+import static pl.koziolekweb.ragecomicsmaker.model.Snippet.loadSnippet;
 
 public class StylesheetEditorController {
     public ComboBox<Snippet> presetsDropdown;

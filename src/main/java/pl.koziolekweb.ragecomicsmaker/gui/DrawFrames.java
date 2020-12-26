@@ -18,13 +18,10 @@ public class DrawFrames {
         this.target = target;
         this.manager = manager;
 
-        target.setOnMousePressed(this::onMousePressed);
-        target.setOnMouseDragged(this::onDragMovement);
-        target.setOnMouseReleased(this::onMouseReleased);
         dragFinishProperty.addListener(this::onDragProgress);
     }
 
-    private void onMousePressed(MouseEvent e) {
+    void onMousePressed(MouseEvent e) {
         // Maybe start a drag-rectangle gesture
         if (e.getButton() != MouseButton.PRIMARY) return;
         if (manager.ignoreFrameEvents()) return;
@@ -32,7 +29,7 @@ public class DrawFrames {
         dragOriginProperty.set(e.getPickResult().getIntersectedPoint());
     }
 
-    private void onMouseReleased(MouseEvent e) {
+    void onMouseReleased(MouseEvent e) {
         // End a drag-rectangle gesture
         if (e.getButton() != MouseButton.PRIMARY) return;
         if (manager.ignoreFrameEvents()) return;
@@ -48,7 +45,7 @@ public class DrawFrames {
         gc.clearRect(0, 0, target.getWidth(), target.getHeight());
     }
 
-    private void onDragMovement(MouseEvent e) {
+    void onDragMovement(MouseEvent e) {
         // While dragging, update finish point. This is then painted by appropriate listeners.
         if (manager.ignoreFrameEvents()) return;
         if (!e.isPrimaryButtonDown()) return;

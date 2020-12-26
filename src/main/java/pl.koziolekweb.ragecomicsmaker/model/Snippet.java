@@ -1,4 +1,4 @@
-package pl.koziolekweb.ragecomicsmaker.gui;
+package pl.koziolekweb.ragecomicsmaker.model;
 
 import org.apache.commons.io.IOUtils;
 
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-class Snippet {
+public class Snippet {
     private String name;
     private String code;
 

@@ -18,6 +18,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -64,7 +65,6 @@ public class ImageEditorController implements FrameManager {
     private SimpleDoubleProperty zoomProperty = new SimpleDoubleProperty(0d);
     public SimpleObjectProperty<Frame> highlightFrame = new SimpleObjectProperty<>();
 
-    @SuppressWarnings("FieldCanBeLocal")
     private DrawFrames drawFrames;
 
     public void initialize() {
@@ -86,6 +86,23 @@ public class ImageEditorController implements FrameManager {
 
         // Wheel event must attach to canvas, which is over the image
         frameCanvas.setOnScroll(this::onScroll);
+
+        frameCanvas.setOnMousePressed(e -> {
+            if (e.getButton() == MouseButton.PRIMARY)
+                drawFrames.onMousePressed(e);
+            else if (e.getButton() == MouseButton.SECONDARY)
+                scrollPane.setPannable(true);
+        });
+        frameCanvas.setOnMouseDragged(e -> {
+            if (e.getButton() == MouseButton.PRIMARY)
+                drawFrames.onDragMovement(e);
+        });
+        frameCanvas.setOnMouseReleased(e -> {
+            if (e.getButton() == MouseButton.PRIMARY)
+                drawFrames.onMouseReleased(e);
+            else if (e.getButton() == MouseButton.SECONDARY)
+                scrollPane.setPannable(false);
+        });
 
         drawFrames = new DrawFrames(frameCanvas, this);
 
@@ -195,15 +212,10 @@ public class ImageEditorController implements FrameManager {
         // Zero means fit-to-screen. But it needs to be converted to an actual zoom value.
         if (Math.abs(z) < 0.01) z = getActualZoom();
 
-        if (zoomIn) {
-            z *= step;
-        } else {
-            z /= step;
-        }
+        if (zoomIn) z *= step;
+        else z /= step;
 
-        // Clamp zoom to a range
-        z = max(0.5, min(z, 4.0));
-        return z;
+        return clamp(0.5, z, 4.0);
     }
 
     private double getActualZoom() {
@@ -214,29 +226,6 @@ public class ImageEditorController implements FrameManager {
 
     private double clamp(double min, double v, double max) {
         return min(max, max(min, v));
-    }
-
-    private Frame createNewFrame(Screen screen, Point3D start, Point3D end, double imgWidth, double imgHeight) {
-        if (end == null) return null;
-        double sy = clamp(0, start.getY(), imgHeight);
-        double ey = clamp(0, end.getY(), imgHeight);
-        double sx = clamp(0, start.getX(), imgWidth);
-        double ex = clamp(0, end.getX(), imgWidth);
-
-        double top = min(sy, ey);
-        double left = min(sx, ex);
-
-        double width = Math.abs(ex - sx);
-        double height = Math.abs(ey - sy);
-
-        // TODO: Return null if rectangle is too small
-        Frame frame = new Frame(screen.getScreenSize());
-        frame.setStartX(left / imgWidth);
-        frame.setStartY(top / imgHeight);
-        frame.setSizeX(width / imgWidth);
-        frame.setSizeY(height / imgHeight);
-        frame.setTransitionDuration(1);
-        return frame;
     }
 
     public void showEditor(Screen screen) {
@@ -307,7 +296,6 @@ public class ImageEditorController implements FrameManager {
     }
 
     // FrameManager
-
     @Override
     public boolean ignoreFrameEvents() {
         return screenProperty.get() == null;
@@ -318,13 +306,40 @@ public class ImageEditorController implements FrameManager {
         double imgWidth = imgWidthProperty.get();
         double imgHeight = imgHeightProperty.get();
         Screen screen = screenProperty.get();
+        int frameId = screen.getFrameCount();
 
-        Optional.ofNullable(createNewFrame(screen, start, end, imgWidth, imgHeight))
+        Optional.ofNullable(createNewFrame(frameId, start, end, imgWidth, imgHeight))
                 .ifPresent(newFrame -> {
                     screen.addFrame(newFrame);
                     showEditor(screen);
-                    // Propagate up
+                    // Propagate to parent controller
                     newFrameCallback.accept(newFrame);
                 });
+    }
+
+    private Frame createNewFrame(int frameId, Point3D start, Point3D end, double imgWidth, double imgHeight) {
+        if (end == null) return null;
+
+        double sy = clamp(0, start.getY(), imgHeight);
+        double ey = clamp(0, end.getY(), imgHeight);
+        double sx = clamp(0, start.getX(), imgWidth);
+        double ex = clamp(0, end.getX(), imgWidth);
+
+        if (sx / imgWidth < 0.05 || sy / imgHeight < 0.05)
+            return null;
+
+        double top = min(sy, ey);
+        double left = min(sx, ex);
+
+        double width = Math.abs(ex - sx);
+        double height = Math.abs(ey - sy);
+
+        Frame frame = new Frame(frameId);
+        frame.setStartX(left / imgWidth);
+        frame.setStartY(top / imgHeight);
+        frame.setSizeX(width / imgWidth);
+        frame.setSizeY(height / imgHeight);
+        frame.setTransitionDuration(1);
+        return frame;
     }
 }
