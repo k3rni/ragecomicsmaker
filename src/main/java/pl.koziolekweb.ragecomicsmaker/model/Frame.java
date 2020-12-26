@@ -53,14 +53,14 @@ public class Frame implements Comparable<Frame> {
 		double sx = clamp(0, start.getX(), imgWidth);
 		double ex = clamp(0, end.getX(), imgWidth);
 
-		if (sx / imgWidth < 0.05 || sy / imgHeight < 0.05)
-			return null;
-
 		double top = min(sy, ey);
 		double left = min(sx, ex);
 
 		double width = Math.abs(ex - sx);
 		double height = Math.abs(ey - sy);
+
+		if (width / imgWidth < 0.05 || height / imgHeight < 0.05)
+			return null;
 
 		Frame frame = new Frame(frameId);
 		frame.setStartX(left / imgWidth);

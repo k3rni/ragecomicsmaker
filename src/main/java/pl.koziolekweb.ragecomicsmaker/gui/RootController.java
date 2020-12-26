@@ -55,7 +55,7 @@ public class RootController {
     ObservableList<Screen> screens;
 
     private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
-    private String darkMode = getClass().getResource("/darkMode.css").toExternalForm();
+    private String darkMode = getClass().getResource("/modena_dark.css").toExternalForm();
 
     @FXML
     void initialize() {

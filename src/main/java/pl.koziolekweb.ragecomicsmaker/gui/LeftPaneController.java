@@ -79,6 +79,7 @@ public class LeftPaneController {
         filePane.itemsProperty().bind(screenListProperty);
         filePane.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
+
         screenProperty.bind(filePane.getSelectionModel().selectedItemProperty());
         screenProperty.addListener(this::onScreenSelected);
     }
@@ -112,10 +113,7 @@ public class LeftPaneController {
     }
 
     public void trackFrameListMouse(ListCell<Frame> f) {
-        if (f == null)
-            hoverFrameProperty.set(null);
-        else
-            hoverFrameProperty.set(f.getItem());
+        hoverFrameProperty.set(f == null ? null : f.getItem());
     }
 
     public void bindScreens(ObservableList<Screen> screens) {
