@@ -139,6 +139,10 @@ public class RootController {
         } else if (e.getCode() == KeyCode.ENTER) {
             editorTabController.fit();
             e.consume();
+        } else if (e.getCode() == KeyCode.ESCAPE) {
+            // Enter can be consumed when focus is e.g. in the screen list
+            editorTabController.fit();
+            e.consume();
         } else if (e.getCode() == KeyCode.PAGE_UP) {
             leftPaneController.previousScreen();
             e.consume();

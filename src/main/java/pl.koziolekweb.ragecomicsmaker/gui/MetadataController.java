@@ -10,6 +10,8 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
 import org.controlsfx.property.editor.Editors;
 import org.controlsfx.property.editor.PropertyEditor;
+import pl.koziolekweb.ragecomicsmaker.gui.settings.BoolProp;
+import pl.koziolekweb.ragecomicsmaker.gui.settings.StringProp;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 
 public class MetadataController {

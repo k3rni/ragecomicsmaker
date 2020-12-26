@@ -1,4 +1,4 @@
-package pl.koziolekweb.ragecomicsmaker.gui;
+package pl.koziolekweb.ragecomicsmaker.gui.settings;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;

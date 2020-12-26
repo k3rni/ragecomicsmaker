@@ -177,7 +177,5 @@ public class LeftPaneController {
         Frame f = hoverFrameProperty.get();
         currentScreen.removeFrame(f);
         touchUI(currentScreen.getFrames());
-        // TODO
-//        framesReorderedCallback.accept(f);
     }
 }

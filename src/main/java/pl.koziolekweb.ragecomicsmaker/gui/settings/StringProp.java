@@ -1,4 +1,4 @@
-package pl.koziolekweb.ragecomicsmaker.gui;
+package pl.koziolekweb.ragecomicsmaker.gui.settings;
 
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -6,7 +6,7 @@ import org.controlsfx.control.PropertySheet;
 
 import java.util.Optional;
 
-class StringProp<P extends StringProperty> implements PropertySheet.Item {
+public class StringProp<P extends StringProperty> implements PropertySheet.Item {
     private String category = null;
     private String description = null;
     private String name;
