@@ -1,6 +1,8 @@
 package pl.koziolekweb.ragecomicsmaker.gui;
 
-import javafx.application.Platform;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -9,40 +11,49 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
+import pl.koziolekweb.ragecomicsmaker.App;
+import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
-import java.util.Timer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ImageEditorController {
-    @FXML public ImageView imageDisplay;
-    @FXML public ScrollPane scrollPane;
-    @FXML public AnchorPane stack;
-    @FXML public Pane framesContainer;
-    @FXML public Canvas frameCanvas;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static pl.koziolekweb.ragecomicsmaker.gui.ZoomToCursor.scrollOffsets;
+import static pl.koziolekweb.ragecomicsmaker.gui.ZoomToCursor.zoomPivot;
+
+public class ImageEditorController implements FrameManager {
+    @FXML
+    public ImageView imageDisplay;
+    @FXML
+    public ScrollPane scrollPane;
+    @FXML
+    public AnchorPane stack;
+    @FXML
+    public Pane framesContainer;
+    @FXML
+    public Canvas frameCanvas;
 
     public Consumer<Frame> newFrameCallback;
 
@@ -51,10 +62,10 @@ public class ImageEditorController {
     private SimpleObjectProperty<Screen> screenProperty = new SimpleObjectProperty<>();
     private ObservableList<Frame> framesProperty = FXCollections.observableArrayList();
     private SimpleDoubleProperty zoomProperty = new SimpleDoubleProperty(0d);
-    private SimpleObjectProperty<Point3D> dragOriginProperty = new SimpleObjectProperty<>();
-    private SimpleObjectProperty<Point3D> dragFinishProperty = new SimpleObjectProperty<>();
     public SimpleObjectProperty<Frame> highlightFrame = new SimpleObjectProperty<>();
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private DrawFrames drawFrames;
 
     public void initialize() {
         AnchorPane.setTopAnchor(imageDisplay, 0.0);
@@ -73,14 +84,10 @@ public class ImageEditorController {
         scrollPane.widthProperty().addListener(this::scrollWidthChanged);
         scrollPane.heightProperty().addListener(this::scrollHeightChanged);
 
-
         // Wheel event must attach to canvas, which is over the image
         frameCanvas.setOnScroll(this::onScroll);
 
-        frameCanvas.setOnMousePressed(this::onMousePressed);
-        frameCanvas.setOnMouseDragged(this::onDragMovement);
-        frameCanvas.setOnMouseReleased(this::onMouseReleased);
-        frameCanvas.setOnMouseClicked(this::onMouseClick);
+        drawFrames = new DrawFrames(frameCanvas, this);
 
         // Handle when image bounds change (on user zoom or window resize auto-fit)
         imageDisplay.boundsInParentProperty().addListener(this::onImageResize);
@@ -97,10 +104,6 @@ public class ImageEditorController {
         screenProperty.addListener(this::onScreenChanged);
         framesProperty.addListener(this::onFramesChanged);
         highlightFrame.addListener(this::highlightFrameChanged);
-
-        zoomProperty.addListener(this::onZoomChanged);
-
-        dragFinishProperty.addListener(this::onDragProgress);
     }
 
     private void onImageResize(ObservableValue<? extends Bounds> observable, Bounds oldBounds, Bounds newBounds) {
@@ -113,121 +116,104 @@ public class ImageEditorController {
     public void fit() {
         // Reset zoom and fit
         zoomProperty.set(0d);
+
+        double width = scrollPane.getWidth();
+        double height = scrollPane.getHeight();
+        imageDisplay.setFitWidth(width);
+        imageDisplay.setFitHeight(height);
+        // XXX: Is this necessary?
+        framesContainer.setPrefWidth(width);
+        framesContainer.setPrefHeight(height);
     }
 
     private void onScroll(ScrollEvent scrollEvent) {
         // Handle mousewheel events
         if (!scrollEvent.isControlDown()) return;
+        if (scrollEvent.getDeltaY() == 0) return;
 
-        double step = Math.sqrt(2.0);
-        double z = zoomProperty.doubleValue();
+        Bounds viewport = scrollPane.getViewportBounds();
+        Bounds img = imageDisplay.getBoundsInLocal();
+        double x = scrollEvent.getX() / img.getWidth();
+        double y = scrollEvent.getY() / img.getHeight();
+        Point2D cursor = new Point2D(x, y);
 
-        if (Math.abs(z) < 0.01) {
-            // Zero means fit-to-screen. But it needs to be converted to an actual zoom value.
-            z = Math.min(stack.getWidth() / imageDisplay.getImage().getWidth(),
-                         stack.getHeight() / imageDisplay.getImage().getHeight());
-        }
-        double z0 = z;
-
-        if (scrollEvent.getDeltaY() < 0)
-            z /= step;
-        else if (scrollEvent.getDeltaY() > 0)
-            z *= step;
-
-        // Clamp zoom to a range
-        z = Math.max(0.5, Math.min(z, 4.0));
-
+        double z = scrollToZoom(scrollEvent);
         zoomProperty.set(z);
 
         // Eat the event, hiding it from the ScrollPane
         scrollEvent.consume();
-    }
 
+        Point2D pivot = zoomPivot(cursor, img, viewport, scrollPane.getHvalue(), scrollPane.getVvalue());
 
-    /* Reference: https://stackoverflow.com/questions/41535624/javafx-8-how-to-get-center-location-of-scrollpanes-viewport
-       During a zoom event, we know the cursor x,y relative to image
-       This can give us scaled offsets (0..1) X,Y
-       Next, we know that the image size will be z*W : z*H after zoom; and our cursor will land on
-       x/z, y/z (or X/z,Y/z scaled) in the new image.
-       dx, dy = x*z - x, y*z - y = x*(z-1), y*(z-1) is how many pixels we need to scroll after zoom
-       add to hvalue, vvalue ???
-    */
-    private void onMouseClick(MouseEvent e) {
-        System.out.printf("HValue %f/%f VValue %f/%f%n", scrollPane.getHvalue(), scrollPane.getHmax(),
-                scrollPane.getVvalue(), scrollPane.getVmax());
-        System.out.println(scrollPane.getViewportBounds());
-        double h = e.getX() / imageDisplay.getBoundsInParent().getWidth();
-        scrollPane.setHvalue(h);
-        e.consume();
-    }
-
-    private void onZoomChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        // Resize image content and frame container to new dimensions.
         Image image = imageDisplay.getImage();
-        double zoom = zoomProperty.get();
+        double w = image.getWidth() * z;
+        double h = image.getHeight() * z;
+        imageDisplay.setFitWidth(w);
+        imageDisplay.setFitHeight(h);
+        // Not sure if necessary
+        framesContainer.setPrefWidth(w);
+        framesContainer.setPrefHeight(h);
 
-        // These cannot be bound to image.widthProperty.multiply() because we set them explicitly
-        // when handling scrollpane's resize events
-        if (Math.abs(zoom) < 0.01) { // Don't compare floats exactly
-            imageDisplay.setFitWidth(scrollPane.getWidth());
-            imageDisplay.setFitHeight(scrollPane.getHeight());
+        // Rescaling done, calculate scroll offset so that image does not move under cursor (if possible)
+        // Note that imageDisplay's bounds have changed now.
+        Point2D offsets = scrollOffsets(cursor, pivot, imageDisplay.getBoundsInLocal(), viewport);
+
+        moveScrollbars(offsets.getX(), offsets.getY());
+    }
+
+    /**
+     * Setting new values in the ScrollPane needs to be done after it has
+     * recalculated itself to the new content. Using a Timeline animation for that.
+     *
+     * @param hv new hValue to set
+     * @param vv new vValue to set
+     */
+    private void moveScrollbars(double hv, double vv) {
+        Timeline tl = new Timeline();
+        tl.setCycleCount(1);
+        tl.getKeyFrames().add(
+                new KeyFrame(Duration.millis(17), // Assuming 60fps, wait one frame
+                        new KeyValue(scrollPane.hvalueProperty(), clamp(0.0, hv, 1.0)),
+                        new KeyValue(scrollPane.vvalueProperty(), clamp(0.0, vv, 1.0))
+                )
+        );
+        tl.play();
+    }
+
+    /**
+     * Zoom gesture: take current zoom value and scroll wheel travel, calculate new zoom.
+     *
+     * @param scrollEvent wheel event
+     * @return new zoom value
+     */
+    private double scrollToZoom(ScrollEvent scrollEvent) {
+        final double step = Math.sqrt(2.0);
+        double z = zoomProperty.doubleValue();
+        boolean zoomIn = scrollEvent.getDeltaY() > 0;
+
+        // Zero means fit-to-screen. But it needs to be converted to an actual zoom value.
+        if (Math.abs(z) < 0.01) z = getActualZoom();
+
+        if (zoomIn) {
+            z *= step;
         } else {
-            imageDisplay.setFitWidth(image.getWidth() * zoom);
-            imageDisplay.setFitHeight(image.getHeight() * zoom);
+            z /= step;
         }
+
+        // Clamp zoom to a range
+        z = max(0.5, min(z, 4.0));
+        return z;
     }
 
-
-    private void onMousePressed(MouseEvent e) {
-        // Maybe start a drag-rectangle gesture
-        if (e.getButton() != MouseButton.PRIMARY) return;
-
-        dragOriginProperty.set(e.getPickResult().getIntersectedPoint());
-    }
-
-    private void onMouseReleased(MouseEvent e) {
-        // End a drag-rectangle gesture
-        if (e.getButton() != MouseButton.PRIMARY) return;
-        if (screenProperty.get() == null) return;
-
-        double imgWidth = imgWidthProperty.get();
-        double imgHeight = imgHeightProperty.get();
-        Point3D start = dragOriginProperty.get();
-        Point3D end = dragFinishProperty.get();
-        Screen screen = screenProperty.get();
-
-        Optional.ofNullable(createNewFrame(screen, start, end, imgWidth, imgHeight))
-                .ifPresent(newFrame -> {
-                    screen.addFrame(newFrame);
-                    showEditor(screen);
-                    // Propagate up
-                    newFrameCallback.accept(newFrame);
-                });
-
-        dragOriginProperty.set(null);
-        dragFinishProperty.set(null);
-
-        GraphicsContext gc = frameCanvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, frameCanvas.getWidth(), frameCanvas.getHeight());
-    }
-
-    private void onDragMovement(MouseEvent e) {
-        // While dragging, update finish point. This is then painted by appropriate listeners.
-        if (screenProperty.get() == null) return;
-        if (!e.isPrimaryButtonDown()) return;
-
-        dragFinishProperty.set(e.getPickResult().getIntersectedPoint());
-    }
-
-    private void onDragProgress(ObservableValue<? extends Point3D> observable, Point3D oldValue, Point3D newValue) {
-        // Draw rectangle between current start and finish points.
-        if (newValue == null) return;
-        if (screenProperty.get() == null) return;
-
-        Visuals.drawNewSelection(frameCanvas, dragOriginProperty.get(), newValue);
+    private double getActualZoom() {
+        Image image = imageDisplay.getImage();
+        return min(stack.getWidth() / image.getWidth(),
+                stack.getHeight() / image.getHeight());
     }
 
     private double clamp(double min, double v, double max) {
-        return Math.min(max, Math.max(min, v));
+        return min(max, max(min, v));
     }
 
     private Frame createNewFrame(Screen screen, Point3D start, Point3D end, double imgWidth, double imgHeight) {
@@ -237,8 +223,8 @@ public class ImageEditorController {
         double sx = clamp(0, start.getX(), imgWidth);
         double ex = clamp(0, end.getX(), imgWidth);
 
-        double top = Math.min(sy, ey);
-        double left = Math.min(sx, ex);
+        double top = min(sy, ey);
+        double left = min(sx, ex);
 
         double width = Math.abs(ex - sx);
         double height = Math.abs(ey - sy);
@@ -264,7 +250,7 @@ public class ImageEditorController {
         try {
             imageDisplay.setImage(new Image(new FileInputStream(newScreen.getImage())));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            App.EVENT_BUS.post(new ErrorEvent("Screen image file not found", e));
         }
     }
 
@@ -286,7 +272,8 @@ public class ImageEditorController {
                         newFrames.stream().filter(f -> f == highlightFrame.get()).map(this::buildFrameRect),
                         // Numbers last
                         newFrames.stream().map(this::buildFrameText)
-                ).flatMap(frame -> frame).collect(Collectors.toUnmodifiableList())
+                ).flatMap(frame -> frame) // flattens a stream of streams
+                        .collect(Collectors.toUnmodifiableList())
         );
     }
 
@@ -300,19 +287,44 @@ public class ImageEditorController {
 
     private Node buildFrameRect(Frame f) {
         // Draw frame around selected area
-        Rectangle r = Visuals.buildFrameRect(f, f == highlightFrame.get());
-        r.widthProperty().bind(imgWidthProperty.multiply(f.getSizeX()));
-        r.heightProperty().bind(imgHeightProperty.multiply(f.getSizeY()));
-        r.xProperty().bind(imgWidthProperty.multiply(f.getStartX()));
-        r.yProperty().bind(imgHeightProperty.multiply(f.getStartY()));
-        return r;
+        Rectangle rect = (f == highlightFrame.get()) ? Visuals.buildHighlightFrameRect()
+                : Visuals.buildFrameRect();
+        rect.widthProperty().bind(imgWidthProperty.multiply(f.getSizeX()));
+        rect.heightProperty().bind(imgHeightProperty.multiply(f.getSizeY()));
+        rect.xProperty().bind(imgWidthProperty.multiply(f.getStartX()));
+        rect.yProperty().bind(imgHeightProperty.multiply(f.getStartY()));
+        return rect;
     }
 
     private void scrollWidthChanged(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+        zoomProperty.set(0);
         imageDisplay.setFitWidth(newValue.doubleValue());
     }
 
     private void scrollHeightChanged(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+        zoomProperty.set(0);
         imageDisplay.setFitHeight(newValue.doubleValue());
+    }
+
+    // FrameManager
+
+    @Override
+    public boolean ignoreFrameEvents() {
+        return screenProperty.get() == null;
+    }
+
+    @Override
+    public void createFrame(Point3D start, Point3D end) {
+        double imgWidth = imgWidthProperty.get();
+        double imgHeight = imgHeightProperty.get();
+        Screen screen = screenProperty.get();
+
+        Optional.ofNullable(createNewFrame(screen, start, end, imgWidth, imgHeight))
+                .ifPresent(newFrame -> {
+                    screen.addFrame(newFrame);
+                    showEditor(screen);
+                    // Propagate up
+                    newFrameCallback.accept(newFrame);
+                });
     }
 }

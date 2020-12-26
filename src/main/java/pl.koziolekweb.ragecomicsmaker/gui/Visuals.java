@@ -40,18 +40,22 @@ public class Visuals {
         return t;
     }
 
-    public static Rectangle buildFrameRect(Frame f, boolean highlight) {
+    public static Rectangle buildFrameRect() {
         Rectangle r = new Rectangle();
         r.setBlendMode(BlendMode.SRC_ATOP);
-        if (highlight) {
-            r.setFill(HIGHLIGHTED_FRAME_FILL);
-            r.setStroke(HIGHLIGHTED_FRAME_BORDER);
-        } else {
-            r.setFill(FRAME_FILL);
-            r.setStroke(FRAME_BORDER);
-        }
+        r.setFill(FRAME_FILL);
+        r.setStroke(FRAME_BORDER);
         r.getStrokeDashArray().setAll(0.5, 0.5);
 
+        return r;
+    }
+
+    public static Rectangle buildHighlightFrameRect() {
+        Rectangle r = new Rectangle();
+        r.setBlendMode(BlendMode.SRC_ATOP);
+        r.setFill(HIGHLIGHTED_FRAME_FILL);
+        r.setStroke(HIGHLIGHTED_FRAME_BORDER);
+        r.getStrokeDashArray().setAll(0.5, 0.5);
         return r;
     }
 
