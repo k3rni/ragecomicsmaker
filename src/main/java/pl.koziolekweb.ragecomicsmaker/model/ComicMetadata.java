@@ -30,7 +30,7 @@ public class ComicMetadata {
                 .name("meta")
                 .property("role")
                 .refines("#illustrator")
-                .value("art");
+                .value("ill");
     }
 
     public MetadataItem description() {

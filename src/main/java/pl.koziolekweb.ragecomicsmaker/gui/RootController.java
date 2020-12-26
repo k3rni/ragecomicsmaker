@@ -136,11 +136,13 @@ public class RootController {
         } else if (e.getCode() == KeyCode.F2) {
             tabPane.getSelectionModel().select(1);
             e.consume();
-        } else if (e.getCode() == KeyCode.ENTER) {
-            editorTabController.fit();
+        } else if (e.isShortcutDown() && e.getCode() == KeyCode.DIGIT1) {
+            tabPane.getSelectionModel().select(0);
             e.consume();
-        } else if (e.getCode() == KeyCode.ESCAPE) {
-            // Enter can be consumed when focus is e.g. in the screen list
+        } else if (e.isShortcutDown() && e.getCode() == KeyCode.DIGIT2) {
+            tabPane.getSelectionModel().select(1);
+            e.consume();
+        } else if (e.isShortcutDown() && e.getCode() == KeyCode.F) {
             editorTabController.fit();
             e.consume();
         } else if (e.getCode() == KeyCode.PAGE_UP) {

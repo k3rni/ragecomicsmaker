@@ -4,33 +4,79 @@ Rage Comics Maker
 Simple program to prepare ACV files from images (jpg/png)
 
 
-Usage
-=====
+User guide
+==========
 
 For best usage, maximize the window.
 
-Click "Select directory", and navigate to a directory of images. 
-These should be named `screenXX.{jpg|png}`, with XX as numbers increasing in
-page reading order. The numbers need not be contiguous.
+Click "Open directory", and navigate to a directory of images. These should be named `screenXX.{jpg|png}`, with XX as
+numbers increasing in page reading order. The numbers need not be contiguous.
 
-The images will load into a list. Click any of them to open the frame drawing interface.
-By drag-and-drop, mark an area to be used as frame, as many times as necessary.
-Use the list next to the image to manage and reorder frames.
+The images will load into a list. Click any of them to load that screen into the frame editor.
 
-Edit metadata by clicking its button, the form displayed is a minimal subset of
-possible ePUB metadata. For the date field, use either a 4 digit year, a year plus month,
-or a full year-month-day date. NOTE: only do this **after** selecting the images directory.
+Frame editor
+------------
 
-Clicking "Build" will do the following:
+Drag an area with the left mouse button to create a frame, as many times as necessary. Drag with right mouse button to
+pan the image around. Mouse wheel scrolls the image vertically, or horizontally when <kbd>Shift</kbd> is held.
+Hold <kbd>Ctrl</kbd> and use the wheel to zoom.
 
-1. Generate frames as separate images in a `clips/` subdirectory. These are always PNG files for now.
-2. Save frame assignments and all metadata in a `comic.xml` file in the images directory
-2. Try to find a `page.xhtml` file in the images directory. This is a mustache-style template of a HTML file
-to be used as each page of the resulting comic. Currently, the variables available to that template
-are only `{{title}}` (as set in metadata) and `{{image}}`, containing the current page, or subframe's image path.
-If not found in the images directory, a simple default will be used.
-3. Produce `book.epub`  in the selected directory. Pages are generated from the source images,
-each followed by its subframes. There is one page for each image, containing the full image,
-followed by pages containing only the frame images.
+Frames are shown with their thumbnail in a list below the screens list. Delete a frame by clicking the X button on its
+entry, reorder by drag-and-drop. Drop a frame on another one in the list to swap their places. Hover the cursor over a
+frame to see it highlighted in the editor area.
 
- 
+Metadata editor
+---------------
+
+Edit metadata by switching to its tab. It shows a minimal subset of possible ePUB metadata. For the date field, use
+either a 4 digit year, a year plus month, or a full year-month-day date. The *Full Pages* option is special, see the *
+Saving* section below for an explanation.
+
+HTML & CSS
+-----------
+
+If necessary, customize per-page HTML and the book CSS in their respective tabs. Each one contains a dropdown list with
+useful snippets. The HTML page is actually a Mustache-style template, to be used as each page of the resulting comic.
+Variables available are:
+
+* `{{title}}` - book's title as set in metadata
+* `{{image}}` - path to current screen image or frame image
+* `{{width}}`, `{{height}}` - dimensions of current screen image or frame image
+
+If left empty and unsaved, a simple default page is used, and no special CSS is added.
+
+Saving
+------
+
+Clicking *Save* saves your changes, but does not generate the e-book yet. To do that, click "Generate Book".
+
+This will produce a file named `TITLE - AUTHOR.epub` (as set in metadata) in the images' directory. It will also
+generate all the subframes as individual images, before embedding them into the epub file. If `Full Pages` option was
+set in the metadata tab, the book will have a single page with each full image, followed by all its frames on separate
+pages. If it was unset, only the frames are inserted.
+
+If a file named `cover.jpg` or `cover.png` exists in the images directory, it will be used as the book's cover.
+
+Keyboard shortcuts
+========
+
+* <kbd>Ctrl+O</kbd>: show open-directory dialog
+* <kbd>Ctrl+S</kbd>: save changes. Doesn't build the epub file.
+* <kbd>F1</kbd>, <kbd>Ctrl+1</kbd>: switch to frame editor tab
+* <kbd>F2</kbd>, <kbd>Ctrl+2</kbd>, <kbd>Ctrl+M</kbd>: switch to metadata tab
+* <kbd>Ctrl+F</kbd>: fit image to editor frame, resetting zoom. Resizing the window will also fit and reset.
+* <kbd>PageUp</kbd>, <kbd>PageDown</kbd> (with focus in editor tab): jump to previous or next screen. When the screens
+  list is focused, these behave differently, and jump around the list.
+* <kbd>Ctrl+0</kbd> (the zero digit): toggle dark mode
+
+On Apple computers, use the <kbd>Command</kbd> key instead of <kbd>Ctrl</kbd>.
+
+## EPUB files generated
+
+The `epub-creator` library used produces EPUB3 files. They have
+a [mandatory navigation section](http://idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav), which is
+automatically inserted before all content. While it is set to hidden, it may still be visible as a blank page in your
+reader. The `Illustrator` metadata property is generated as
+a [`dc:creator`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-opf-dccreator) element, annotated with
+an `ill` [role](https://www.w3.org/publishing/epub3/epub-packages.html#sec-role). Similarly, ISBN is a `dc:identifier`
+with `scheme` set to `isbn`.
