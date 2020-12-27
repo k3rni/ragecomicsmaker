@@ -1,15 +1,16 @@
 Rage Comics Maker
 =======
 
-Simple program to prepare ACV files from images (jpg/png)
+Used to be a simple program to prepare ACV files from images (jpg/png). Now it's purpose is to create EPUB-format comic
+books, from a set of images.
 
 
 User guide
 ==========
 
-For best usage, maximize the window.
+For best usage, maximize the window (the program should start maximized).
 
-Click "Open directory", and navigate to a directory of images. These should be named `screenXX.{jpg|png}`, with XX as
+Click "Open directory", and navigate to a directory of images. These must be named `screenXX.{jpg|png}`, with XX as
 numbers increasing in page reading order. The numbers need not be contiguous.
 
 The images will load into a list. Click any of them to load that screen into the frame editor.
@@ -17,9 +18,10 @@ The images will load into a list. Click any of them to load that screen into the
 Frame editor
 ------------
 
-Drag an area with the left mouse button to create a frame, as many times as necessary. Drag with right mouse button to
-pan the image around. Mouse wheel scrolls the image vertically, or horizontally when <kbd>Shift</kbd> is held.
-Hold <kbd>Ctrl</kbd> and use the wheel to zoom.
+Drag an area with the left mouse button to create a frame, as many times as necessary. Frames must be larger than 5% of
+width or height, otherwise they will be rejected as accidental clicks. Drag with right mouse button to pan the image
+around. Mouse wheel scrolls the image vertically, or horizontally when <kbd>Shift</kbd> is held. Hold <kbd>Ctrl</kbd>
+and use the wheel to zoom.
 
 Frames are shown with their thumbnail in a list below the screens list. Delete a frame by clicking the X button on its
 entry, reorder by drag-and-drop. Drop a frame on another one in the list to swap their places. Hover the cursor over a

@@ -1,4 +1,4 @@
-module pl.koziolekweb.ragecomismaker {
+module pl.koziolekweb.ragecomicsmaker {
     requires java.desktop;
     requires javafx.base;
     requires javafx.fxml;
