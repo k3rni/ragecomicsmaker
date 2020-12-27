@@ -17,7 +17,6 @@ import java.util.TreeSet;
  * TODO write JAVADOC!!!
  * User: koziolek
  */
-@SuppressWarnings("UnstableApiUsage")
 @JacksonXmlRootElement(localName = "comic")
 public class Comic implements Serializable {
 	@JacksonXmlProperty(isAttribute = true)

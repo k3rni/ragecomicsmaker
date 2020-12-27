@@ -12,17 +12,13 @@ import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 class FrameListCell extends ListCell<Frame> {
     private final SnapshotParameters snapshotParameters = new SnapshotParameters();
-    private Callback<Frame, Node> nodeCreator;
-    private Consumer<List<Frame>> reorderCallback;
+    private final Callback<Frame, Node> nodeCreator;
+    private final Consumer<List<Frame>> reorderCallback;
 
     public FrameListCell(Consumer<FrameListCell> mouseTracker,
                          Callback<Frame, Node> nodeCreator,
@@ -48,7 +44,7 @@ class FrameListCell extends ListCell<Frame> {
     }
 
     private void configureDnd() {
-        ListCell thisCell = this;
+        ListCell<Frame> thisCell = this;
 
         setOnDragDetected(event -> {
             if (getItem() == null) return;
@@ -101,19 +97,15 @@ class FrameListCell extends ListCell<Frame> {
         if (drag.hasString()) {
             ObservableList<Frame> items = getListView().getItems();
 
-            int draggedId = Integer.valueOf(drag.getString());
+            int draggedId = Integer.parseInt(drag.getString());
             Frame draggedItem = items.stream().filter(obj -> obj.getId() == draggedId).findFirst().get();
-            int draggedIndex = items.indexOf(draggedItem);
 
             Frame targetItem = getItem();
             int targetId = targetItem.getId();
-            int targetIndex = items.indexOf(targetItem);
 
-            // Only set ids. Don't swap
             targetItem.setId(draggedId);
             draggedItem.setId(targetId);
 
-//            Collections.swap(items, draggedIndex, targetIndex);
             success = true;
             reorderCallback.accept(items);
         }
@@ -128,7 +120,7 @@ class FrameListCell extends ListCell<Frame> {
         if (drag.hasString()) {
             ObservableList<Frame> items = getListView().getItems();
 
-            int draggedId = Integer.valueOf(drag.getString());
+            int draggedId = Integer.parseInt(drag.getString());
             Frame draggedItem = items.stream().filter(obj -> obj.getId() == draggedId).findFirst().get();
 
             // TODO: This only removes item from the listview. But it will not propagate

@@ -9,7 +9,7 @@ import java.util.Optional;
 public class StringProp<P extends StringProperty> implements PropertySheet.Item {
     private String category = null;
     private String description = null;
-    private String name;
+    private final String name;
     P underlyingProperty;
 
     public StringProp(String name, P prop) {
@@ -53,7 +53,7 @@ public class StringProp<P extends StringProperty> implements PropertySheet.Item 
     }
 
     @Override
-    public Optional<ObservableValue<? extends Object>> getObservableValue() {
+    public Optional<ObservableValue<?>> getObservableValue() {
         return Optional.of(underlyingProperty);
     }
 

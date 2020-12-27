@@ -44,9 +44,12 @@ public class RootController {
     @FXML ImageEditorController editorTabController;
     @FXML LeftPaneController leftPaneController;
     @FXML TemplateEditorController templateTabController;
-    @FXML StylesheetEditorController stylesheetTabController;
-    @FXML Button saveBtn;
-    @FXML Button generateBtn;
+    @FXML
+    StylesheetEditorController stylesheetTabController;
+    @FXML
+    Button saveBtn;
+    @FXML
+    Button generateBtn;
 
     Path targetDir;
     Comic comic = null;
@@ -54,8 +57,8 @@ public class RootController {
 
     ObservableList<Screen> screens;
 
-    private GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
-    private String darkMode = getClass().getResource("/modena_dark.css").toExternalForm();
+    private final GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
+    private final String darkMode = getClass().getResource("/modena_dark.css").toExternalForm();
 
     @FXML
     void initialize() {

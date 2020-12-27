@@ -5,7 +5,7 @@ import coza.opencollab.epub.creator.api.MetadataItem;
 import static coza.opencollab.epub.creator.api.MetadataItem.builder;
 
 public class ComicMetadata {
-    private Comic comic;
+    private final Comic comic;
 
     public ComicMetadata(Comic comic) {
         this.comic = comic;

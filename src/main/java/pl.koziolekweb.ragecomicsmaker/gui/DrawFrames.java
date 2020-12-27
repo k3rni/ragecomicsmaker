@@ -9,10 +9,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 public class DrawFrames {
-    private SimpleObjectProperty<Point3D> dragOriginProperty = new SimpleObjectProperty<>();
-    private SimpleObjectProperty<Point3D> dragFinishProperty = new SimpleObjectProperty<>();
-    private Canvas target;
-    private FrameManager manager;
+    private final SimpleObjectProperty<Point3D> dragOriginProperty = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<Point3D> dragFinishProperty = new SimpleObjectProperty<>();
+    private final Canvas target;
+    private final FrameManager manager;
 
     public DrawFrames(Canvas target, FrameManager manager) {
         this.target = target;

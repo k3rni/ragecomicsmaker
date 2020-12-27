@@ -3,7 +3,6 @@ package pl.koziolekweb.ragecomicsmaker;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
-import com.google.common.collect.Lists;
 import coza.opencollab.epub.creator.api.MetadataItem;
 import coza.opencollab.epub.creator.api.OpfCreator;
 import coza.opencollab.epub.creator.impl.OpfCreatorDefault;
@@ -20,18 +19,12 @@ import pl.koziolekweb.ragecomicsmaker.model.ComicMetadata;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.List;
-
-import static coza.opencollab.epub.creator.api.MetadataItem.builder;
 
 public class ComicCompiler {
     private final File targetDir;

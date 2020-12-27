@@ -33,6 +33,7 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -58,11 +59,11 @@ public class ImageEditorController implements FrameManager {
 
     public Consumer<Frame> newFrameCallback;
 
-    private SimpleDoubleProperty imgWidthProperty = new SimpleDoubleProperty();
-    private SimpleDoubleProperty imgHeightProperty = new SimpleDoubleProperty();
-    private SimpleObjectProperty<Screen> screenProperty = new SimpleObjectProperty<>();
-    private ObservableList<Frame> framesProperty = FXCollections.observableArrayList();
-    private SimpleDoubleProperty zoomProperty = new SimpleDoubleProperty(0d);
+    private final SimpleDoubleProperty imgWidthProperty = new SimpleDoubleProperty();
+    private final SimpleDoubleProperty imgHeightProperty = new SimpleDoubleProperty();
+    private final SimpleObjectProperty<Screen> screenProperty = new SimpleObjectProperty<>();
+    private final ObservableList<Frame> framesProperty = FXCollections.observableArrayList();
+    private final SimpleDoubleProperty zoomProperty = new SimpleDoubleProperty(0d);
     public SimpleObjectProperty<Frame> highlightFrame = new SimpleObjectProperty<>();
 
     private DrawFrames drawFrames;
@@ -243,7 +244,7 @@ public class ImageEditorController implements FrameManager {
 
     private void onFramesChanged(ListChangeListener.Change<? extends Frame> change) {
         // Triggered by showEditor, whenever frames are added/removed/reordered
-        createVisualFrames((List<Frame>) change.getList());
+        createVisualFrames(Collections.unmodifiableList(change.getList()));
     }
 
     private void highlightFrameChanged(ObservableValue<? extends Frame> observable, Frame oldValue, Frame newValue) {

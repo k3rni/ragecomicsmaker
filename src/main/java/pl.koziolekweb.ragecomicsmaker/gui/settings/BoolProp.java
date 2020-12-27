@@ -9,8 +9,8 @@ import java.util.Optional;
 public class BoolProp<P extends BooleanProperty> implements PropertySheet.Item {
     private String category;
     private String description = null;
-    private String name;
-    P underlyingProperty;
+    private final String name;
+    private final P underlyingProperty;
 
     public BoolProp(String name, P prop) {
         this.name = name;
@@ -58,7 +58,7 @@ public class BoolProp<P extends BooleanProperty> implements PropertySheet.Item {
     }
 
     @Override
-    public Optional<ObservableValue<? extends Object>> getObservableValue() {
+    public Optional<ObservableValue<?>> getObservableValue() {
         return Optional.of(underlyingProperty);
     }
 }

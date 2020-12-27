@@ -3,17 +3,15 @@ package pl.koziolekweb.ragecomicsmaker;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.io.Files;
-import javafx.scene.control.Alert;
-import javafx.scene.control.DialogPane;
-import pl.koziolekweb.ragecomicsmaker.ComicCompiler;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -25,8 +23,8 @@ import java.time.format.DateTimeFormatter;
  */
 @SuppressWarnings("UnstableApiUsage")
 public class SaveCommand {
-	private Comic comic;
-	private File targetDir;
+	private final Comic comic;
+	private final File targetDir;
 	private final DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
 
 	public SaveCommand(Comic comic, File targetDir) {

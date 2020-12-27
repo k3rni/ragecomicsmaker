@@ -7,8 +7,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 public class Snippet {
-    private String name;
-    private String code;
+    private final String name;
+    private final String code;
 
     public static Snippet loadSnippet(String resourcePath, String title) {
         URL res = Snippet.class.getResource(resourcePath);

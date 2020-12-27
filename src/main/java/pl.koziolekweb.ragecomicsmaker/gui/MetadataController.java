@@ -26,12 +26,10 @@ public class MetadataController {
     private PropertyEditor<?> selectPropertyEditor(PropertySheet.Item item) {
         if (item.getType() == Boolean.class)
             return Editors.createCheckEditor(item);
-        switch (item.getName()) {
-            case "Description":
-                return createTextareaEditor(item);
-            default:
-                return Editors.createTextEditor(item);
+        if ("Description".equals(item.getName())) {
+            return createTextareaEditor(item);
         }
+        return Editors.createTextEditor(item);
     }
 
     public void setComic(Comic comic) {
@@ -39,6 +37,7 @@ public class MetadataController {
         this.propsheet.getItems().setAll(getPropertyItems(this.comic));
     }
 
+    @SuppressWarnings("unused")
     private ObservableList<PropertySheet.Item> getPropertyItems(SimpleObjectProperty<Comic> comicProp) {
         Comic com = comic.get();
         final String OUTPUT = "Output preferences";

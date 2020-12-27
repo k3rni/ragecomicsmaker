@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class LoadCommand {
-    private Path dir;
+    private final Path dir;
     private Comic comic;
 
     public LoadCommand(Path dir) {
@@ -78,9 +78,6 @@ public class LoadCommand {
     List<File> getImages(Optional<String> namePattern) {
         final String digits = "[0-9]+";
         final String extPattern = "(jpg|png)";
-
-//        if (targetDir == null)
-//            return Collections.emptyList();
 
         String pattern = namePattern.orElse("screen")
                 .split("@")[0] +

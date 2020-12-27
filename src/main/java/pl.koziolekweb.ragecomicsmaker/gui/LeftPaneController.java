@@ -44,8 +44,8 @@ public class LeftPaneController {
     public SimpleObjectProperty<Frame> hoverFrameProperty = new SimpleObjectProperty<>();
 
     private boolean setupDone = false;
-    
-    private WeakHashMap<Frame, Image> frameThumbnails = new WeakHashMap<>();
+
+    private final WeakHashMap<Frame, Image> frameThumbnails = new WeakHashMap<>();
     GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
 
     @FXML

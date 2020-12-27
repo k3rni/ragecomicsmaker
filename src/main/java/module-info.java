@@ -10,7 +10,9 @@ module pl.koziolekweb.ragecomicsmaker {
     requires com.fasterxml.jackson.dataformat.xml;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
+    //noinspection Java9RedundantRequiresStatement
     requires org.codehaus.stax2;
+    //noinspection Java9RedundantRequiresStatement
     requires com.ctc.wstx;
     requires com.google.common;
     requires thumbnailator;

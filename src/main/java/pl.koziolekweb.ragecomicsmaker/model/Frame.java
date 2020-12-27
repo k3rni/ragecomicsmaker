@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import javafx.geometry.Point3D;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -183,6 +184,7 @@ public class Frame implements Comparable<Frame> {
 							return input;
 						}
 				).toArray(new Double[4]);
+
 		startX = doubles[0];
 		startY = doubles[1];
 		sizeX = doubles[2];
@@ -191,11 +193,9 @@ public class Frame implements Comparable<Frame> {
 	}
 
 	@Override
-	public int compareTo(Frame that) {
+	public int compareTo(@Nullable Frame that) {
 		if (that == null) return 1;
-		if (this.id < that.id) return -1;
-		else if (this.id == that.id) return 0;
-		else return 1;
+		return Integer.compare(this.id, that.id);
 	}
 
 	@JsonIgnore

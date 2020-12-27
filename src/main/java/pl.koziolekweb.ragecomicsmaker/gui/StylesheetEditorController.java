@@ -48,9 +48,7 @@ public class StylesheetEditorController {
             int caret = codeArea.getCaretPosition();
             int para = codeArea.getCurrentParagraph();
             Matcher m = whiteSpace.matcher(codeArea.getParagraph(para - 1).getSegments().get(0));
-            if (m.find()) Platform.runLater(() -> {
-                codeArea.insertText(caret, m.group());
-            });
+            if (m.find()) Platform.runLater(() -> codeArea.insertText(caret, m.group()));
         });
     }
 
