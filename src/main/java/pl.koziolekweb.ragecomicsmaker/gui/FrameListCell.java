@@ -123,8 +123,6 @@ class FrameListCell extends ListCell<Frame> {
             int draggedId = Integer.parseInt(drag.getString());
             Frame draggedItem = items.stream().filter(obj -> obj.getId() == draggedId).findFirst().get();
 
-            // TODO: This only removes item from the listview. But it will not propagate
-            // to LeftPaneController's master frame list
             items.remove(draggedItem);
             success = true;
             reorderCallback.accept(items);
