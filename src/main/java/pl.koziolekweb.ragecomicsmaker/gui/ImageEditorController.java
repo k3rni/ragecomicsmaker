@@ -69,14 +69,8 @@ public class ImageEditorController implements FrameManager {
     private DrawFrames drawFrames;
 
     public void initialize() {
-        AnchorPane.setTopAnchor(imageDisplay, 0.0);
-        AnchorPane.setBottomAnchor(imageDisplay, 0.0);
-        AnchorPane.setLeftAnchor(imageDisplay, 0.0);
-        AnchorPane.setRightAnchor(imageDisplay, 0.0);
-        AnchorPane.setTopAnchor(framesContainer, 0.0);
-        AnchorPane.setBottomAnchor(framesContainer, 0.0);
-        AnchorPane.setLeftAnchor(framesContainer, 0.0);
-        AnchorPane.setRightAnchor(framesContainer, 0.0);
+        anchorElement(imageDisplay);
+        anchorElement(framesContainer);
 
         imageDisplay.setPreserveRatio(true);
 
@@ -85,25 +79,8 @@ public class ImageEditorController implements FrameManager {
         scrollPane.widthProperty().addListener(this::scrollWidthChanged);
         scrollPane.heightProperty().addListener(this::scrollHeightChanged);
 
-        // Wheel event must attach to canvas, which is over the image
-        frameCanvas.setOnScroll(this::onScroll);
-
-        frameCanvas.setOnMousePressed(e -> {
-            if (e.getButton() == MouseButton.PRIMARY)
-                drawFrames.onMousePressed(e);
-            else if (e.getButton() == MouseButton.SECONDARY)
-                scrollPane.setPannable(true);
-        });
-        frameCanvas.setOnMouseDragged(e -> {
-            if (e.getButton() == MouseButton.PRIMARY)
-                drawFrames.onDragMovement(e);
-        });
-        frameCanvas.setOnMouseReleased(e -> {
-            if (e.getButton() == MouseButton.PRIMARY)
-                drawFrames.onMouseReleased(e);
-            else if (e.getButton() == MouseButton.SECONDARY)
-                scrollPane.setPannable(false);
-        });
+        configureZoom();
+        configureDrawing();
 
         drawFrames = new DrawFrames(frameCanvas, this);
 
@@ -122,6 +99,37 @@ public class ImageEditorController implements FrameManager {
         screenProperty.addListener(this::onScreenChanged);
         framesProperty.addListener(this::onFramesChanged);
         highlightFrame.addListener(this::highlightFrameChanged);
+    }
+
+    private void anchorElement(Node node) {
+        AnchorPane.setTopAnchor(node, 0.0);
+        AnchorPane.setBottomAnchor(node, 0.0);
+        AnchorPane.setLeftAnchor(node, 0.0);
+        AnchorPane.setRightAnchor(node, 0.0);
+    }
+
+    private void configureDrawing() {
+        frameCanvas.setOnMousePressed(e -> {
+            if (e.getButton() == MouseButton.PRIMARY)
+                drawFrames.onMousePressed(e);
+            else if (e.getButton() == MouseButton.SECONDARY)
+                scrollPane.setPannable(true);
+        });
+        frameCanvas.setOnMouseDragged(e -> {
+            if (e.getButton() == MouseButton.PRIMARY)
+                drawFrames.onDragMovement(e);
+        });
+        frameCanvas.setOnMouseReleased(e -> {
+            if (e.getButton() == MouseButton.PRIMARY)
+                drawFrames.onMouseReleased(e);
+            else if (e.getButton() == MouseButton.SECONDARY)
+                scrollPane.setPannable(false);
+        });
+    }
+
+    private void configureZoom() {
+        // Wheel event must attach to canvas, which is over the image
+        frameCanvas.setOnScroll(this::onScroll);
     }
 
     private void onImageResize(ObservableValue<? extends Bounds> observable, Bounds oldBounds, Bounds newBounds) {
@@ -145,7 +153,7 @@ public class ImageEditorController implements FrameManager {
     }
 
     private void onScroll(ScrollEvent scrollEvent) {
-        // Handle mousewheel events
+        // Handle mouse wheel events
         if (!scrollEvent.isControlDown()) return;
         if (scrollEvent.getDeltaY() == 0) return;
 
@@ -233,6 +241,7 @@ public class ImageEditorController implements FrameManager {
         framesProperty.setAll(screen.getFrames());
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void onScreenChanged(ObservableValue<? extends Screen> observable, Screen oldScreen, Screen newScreen) {
         // Triggered by showEditor, whenever screen is changed
         try {
