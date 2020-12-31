@@ -69,15 +69,6 @@ public class ImageEditorController implements FrameManager {
     private DrawFrames drawFrames;
 
     public void initialize() {
-        AnchorPane.setTopAnchor(imageDisplay, 0.0);
-        AnchorPane.setBottomAnchor(imageDisplay, 0.0);
-        AnchorPane.setLeftAnchor(imageDisplay, 0.0);
-        AnchorPane.setRightAnchor(imageDisplay, 0.0);
-        AnchorPane.setTopAnchor(framesContainer, 0.0);
-        AnchorPane.setBottomAnchor(framesContainer, 0.0);
-        AnchorPane.setLeftAnchor(framesContainer, 0.0);
-        AnchorPane.setRightAnchor(framesContainer, 0.0);
-
         imageDisplay.setPreserveRatio(true);
 
         // Handle window resize events, send to resize image appropriately
