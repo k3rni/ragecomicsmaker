@@ -35,15 +35,23 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class RootController {
-    @FXML public Region spring;
-    @FXML public SplitPane leftPane;
-    @FXML public TabPane tabPane;
-    @FXML public Button browseBtn;
+    @FXML
+    public Region spring;
+    @FXML
+    public SplitPane leftPane;
+    @FXML
+    public TabPane tabPane;
+    @FXML
+    public Button browseBtn;
 
-    @FXML MetadataController metadataTabController;
-    @FXML ImageEditorController editorTabController;
-    @FXML LeftPaneController leftPaneController;
-    @FXML TemplateEditorController templateTabController;
+    @FXML
+    MetadataController metadataTabController;
+    @FXML
+    ImageEditorController editorTabController;
+    @FXML
+    LeftPaneController leftPaneController;
+    @FXML
+    TemplateEditorController templateTabController;
     @FXML
     StylesheetEditorController stylesheetTabController;
     @FXML
@@ -66,8 +74,12 @@ public class RootController {
 
         // No easy way to set this from fxml
         saveBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.SAVE));
-        browseBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.FOLDER));
+        browseBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.FOLDER_OPEN));
         generateBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.BOOK));
+        tabPane.getTabs().get(0).setGraphic(fontAwesome.create(FontAwesome.Glyph.EDIT));
+        tabPane.getTabs().get(1).setGraphic(fontAwesome.create(FontAwesome.Glyph.TAGS));
+        tabPane.getTabs().get(2).setGraphic(fontAwesome.create(FontAwesome.Glyph.HTML5));
+        tabPane.getTabs().get(3).setGraphic(fontAwesome.create(FontAwesome.Glyph.CSS3));
 
         // Splitter is fixed in place, and does not resize automatically with window. Manual resize works.
         SplitPane.setResizableWithParent(leftPane, false);
