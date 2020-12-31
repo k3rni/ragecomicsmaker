@@ -76,6 +76,7 @@ public class LeftPaneController {
                 }
             }
         });
+
         filePane.itemsProperty().bind(screenListProperty);
         filePane.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 

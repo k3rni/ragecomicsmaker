@@ -34,6 +34,7 @@ public class ZoomToCursor {
         // Scrollpane offsets, pre-zoom, pixels
         double ox = (img.getWidth() - viewport.getWidth()) * hValue;
         double oy = (img.getHeight() - viewport.getHeight()) * vValue;
+
         // Scrollpane-relative, pre-zoom, unit-scaled
         double sx = (x * img.getWidth() - ox) / viewport.getWidth();
         double sy = (y * img.getHeight() - oy) / viewport.getHeight();
@@ -67,8 +68,8 @@ public class ZoomToCursor {
         // And from these, we calculate hvalue and vvalue
         // ox = (w - vw) * hv
         // hv = ox / (w - vw)
-        final double hv = ox / (img.getWidth() - viewport.getWidth());
-        final double vv = oy / (img.getHeight() - viewport.getHeight());
+        double hv = ox / (img.getWidth() - viewport.getWidth());
+        double vv = oy / (img.getHeight() - viewport.getHeight());
 
         return new Point2D(hv, vv);
     }
