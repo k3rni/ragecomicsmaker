@@ -1,8 +1,8 @@
 Rage Comics Maker
 =======
 
-Used to be a simple program to prepare ACV files from images (jpg/png). Now it's purpose is to create EPUB-format comic
-books, from a set of images.
+Used to be a simple program to prepare ACV files from images (jpg/png). Now it's purpose is to create comic books in
+popular formats, from a set of images. Currently, EPUB and CBZ output is implemented.
 
 
 User guide
@@ -47,10 +47,10 @@ Variables available are:
 
 If left empty and unsaved, a simple default page is used, and no special CSS is added.
 
-Saving
-------
+Saving and exporting
+--------------------
 
-Clicking *Save* saves your changes, but does not generate the e-book yet. To do that, click "Generate Book".
+Clicking *Save* saves your changes, but does not generate the e-book yet. To do that, click "Export EPUB".
 
 This will produce a file named `TITLE - AUTHOR.epub` (as set in metadata) in the images' directory. It will also
 generate all the subframes as individual images, before embedding them into the epub file. If `Full Pages` option was
@@ -58,6 +58,7 @@ set in the metadata tab, the book will have a single page with each full image, 
 pages. If it was unset, only the frames are inserted.
 
 If a file named `cover.jpg` or `cover.png` exists in the images directory, it will be used as the book's cover.
+
 
 Keyboard shortcuts
 ========
@@ -73,7 +74,8 @@ Keyboard shortcuts
 
 On Apple computers, use the <kbd>Command</kbd> key instead of <kbd>Ctrl</kbd>.
 
-## EPUB files generated
+Output format info
+==================
 
 The `epub-creator` library used produces EPUB3 files. They have
 a [mandatory navigation section](http://idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav), which is
@@ -82,3 +84,7 @@ reader. The `Illustrator` metadata property is generated as
 a [`dc:creator`](https://www.w3.org/publishing/epub3/epub-packages.html#sec-opf-dccreator) element, annotated with
 an `ill` [role](https://www.w3.org/publishing/epub3/epub-packages.html#sec-role). Similarly, ISBN is a `dc:identifier`
 with `scheme` set to `isbn`.
+
+CBZ files name image files differently than the original. A full frame image is always named `XXXX_00.png` (zero-padding
+the screen number to four digits), and its subframes are `XXXX_YY.png`. Currently, no metadata ships with CBZ files.
+This may change in the future.
