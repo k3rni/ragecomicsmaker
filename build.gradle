@@ -27,7 +27,6 @@ dependencies {
     implementation 'com.fasterxml.woodstox:woodstox-core:5.1.0'
     // Utilities
     implementation 'com.google.guava:guava:30.0-jre'
-    implementation 'commons-io:commons-io:2.8.0'
     // Image format support. Java's built-in jpeg is very limited.
     implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.0-rc5'
     // Template language used for XHTML file generation

@@ -2,7 +2,6 @@ package pl.koziolekweb.ragecomicsmaker;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.google.common.io.Files;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
@@ -10,22 +9,19 @@ import pl.koziolekweb.ragecomicsmaker.model.Screen;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * TODO write JAVADOC!!!
- * User: koziolek
- */
 @SuppressWarnings("UnstableApiUsage")
 public class SaveCommand {
 	private final Comic comic;
 	private final File targetDir;
-	private final DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
 
 	public SaveCommand(Comic comic, File targetDir) {
 		this.comic = comic;
@@ -33,20 +29,29 @@ public class SaveCommand {
 	}
 
 	public void save() throws IOException {
-		String name = targetDir.getAbsolutePath() + File.separator + "comic.xml";
-		File comicFile = new File(name);
-		if (comicFile.exists()) {
-			File backup = new File(targetDir.getAbsolutePath() + File.separator + "backup-" +
-					sdf.format(LocalDateTime.now())
-					+ "-comic.xml");
-			Files.move(comicFile, backup);
+		Path comicFile = targetDir.toPath().resolve("comic.xml");
+		if (Files.exists(comicFile)) saveBackup(comicFile);
+
+		XmlMapper mapper = createXMLMapper();
+		try (OutputStream io = Files.newOutputStream(comicFile, StandardOpenOption.CREATE)) {
+			mapper.writeValue(io, comic);
 		}
-		comicFile.createNewFile();
-		XmlMapper mapper = new XmlMapper();
-		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		mapper.writeValue(new FileOutputStream(name), comic);
+
 		// Iterate over all images in comic and their crops. Use ImageIO to produce tiny cropped files
 		saveSubImages();
+	}
+
+	private void saveBackup(Path comicFile) throws IOException {
+		final DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
+		String name = String.format("backup-%s-comic.xml", sdf.format(LocalDateTime.now()));
+		Path backup = comicFile.resolveSibling(name);
+		Files.move(comicFile, backup);
+	}
+
+	private XmlMapper createXMLMapper() {
+		XmlMapper mapper = new XmlMapper();
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		return mapper;
 	}
 
 	private void saveSubImages() throws IOException {
@@ -55,14 +60,14 @@ public class SaveCommand {
 			if (screen.getFrames().size() == 0) continue;
 			if (screen.getImage() == null) continue;
 
-			BufferedImage image = ImageIO.read(screen.getImage());
+			BufferedImage source = ImageIO.read(screen.getImage());
 			for (Frame frame : screen.getFrames()) {
 				String frameFilename = frameFilename(screen, frame);
 				Path path = clipPath(frameFilename);
 
-				BufferedImage clip = getSubImage(image, frame);
-				Files.createParentDirs(path.toFile());
-				ImageIO.write(clip, "png", path.toFile());
+				BufferedImage crop = screen.crop(source, frame);
+				java.nio.file.Files.createDirectories(path.getParent());
+				ImageIO.write(crop, "png", path.toFile());
 			}
 		}
 	}
@@ -72,20 +77,6 @@ public class SaveCommand {
 	}
 
 	private String frameFilename(Screen screen, Frame frame) {
-		return String.format("%1$03d_%2$03d.png", screen.getIndex(), frame.getId());
-	}
-
-	// Now also available as Screen.crop
-	private BufferedImage getSubImage(BufferedImage image, Frame frame) {
-		double x = frame.getStartX() * image.getWidth();
-		double w = frame.getSizeX() * image.getWidth();
-		double y = frame.getStartY() * image.getHeight();
-		double h = frame.getSizeY() * image.getHeight();
-
-		return image.getSubimage(
-				(int) Math.round(x),
-				(int) Math.round(y),
-				(int) Math.round(w),
-				(int) Math.round(h));
+		return String.format("%03d_%03d.png", screen.getIndex(), frame.getId());
 	}
 }

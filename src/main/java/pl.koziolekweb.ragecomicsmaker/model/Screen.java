@@ -100,13 +100,16 @@ public class Screen implements Serializable, Comparable<Screen> {
 
 	public BufferedImage crop(Frame frame) throws IOException {
 		BufferedImage image = ImageIO.read(this.image);
+		return crop(image, frame);
+	}
 
-		double x = frame.getStartX() * image.getWidth();
-		double w = frame.getSizeX() * image.getWidth();
-		double y = frame.getStartY() * image.getHeight();
-		double h = frame.getSizeY() * image.getHeight();
+	public BufferedImage crop(BufferedImage source, Frame frame) {
+		double x = frame.getStartX() * source.getWidth();
+		double w = frame.getSizeX() * source.getWidth();
+		double y = frame.getStartY() * source.getHeight();
+		double h = frame.getSizeY() * source.getHeight();
 
-		return image.getSubimage(
+		return source.getSubimage(
 				(int) Math.round(x),
 				(int) Math.round(y),
 				(int) Math.round(w),
