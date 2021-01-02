@@ -47,6 +47,7 @@ public class EpubCompiler {
     public Path save() throws IOException {
         EpubBook book = new EpubBook();
 
+        setBasicMetadata(book);
         addBookImages(book);
         addCover(book);
         addStylesheet(book);
@@ -60,7 +61,7 @@ public class EpubCompiler {
             if (comic.getInsertFullPages()) {
                 String href = String.format("page-%d.xhtml", screen.getIndex());
 
-                Content content = book.addContent(pageBytes(screen, template),
+                Content content = book.addContent(pageBytes(template, pageScope(screen)),
                         "text/html",
                         href,
                         true, true);
@@ -71,7 +72,7 @@ public class EpubCompiler {
             for (Frame frame : screen.getFrames()) {
                 String frame_ref = String.format("page-%d-%d.xhtml", screen.getIndex(), frame.getId());
                 book.addContent(
-                        pageBytes(screen, frame, template),
+                        pageBytes(template, frameScope(frame, screen)),
                         "text/html",
                         frame_ref,
                         false, true)
@@ -80,7 +81,7 @@ public class EpubCompiler {
         }
 
         book.setLandmarks(List.of(firstPageLandmark()));
-        setBasicMetadata(book);
+
         Collection<MetadataItem> metadata = extraMetadata();
         return saveToFile(book, metadata);
     }
@@ -126,24 +127,13 @@ public class EpubCompiler {
         }
     }
 
-    private byte[] pageBytes(Screen screen, Mustache template) {
+    private byte[] pageBytes(Mustache template, Map<String, Object> scope) {
         StringWriter writer = new StringWriter();
-        Map<String, Object> scope = pageScope(screen, this.comic);
-
-        template.execute(writer, scope);
-
-        return writer.toString().getBytes(StandardCharsets.UTF_8);
-    }
-
-    private byte[] pageBytes(Screen screen, Frame frame, Mustache template) {
-        StringWriter writer = new StringWriter();
-        Map<String, Object> scope = frameScope(frame, screen, comic);
-
         template.execute(writer, scope);
         return writer.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    private Map<String, Object> pageScope(Screen screen, Comic comic) {
+    private Map<String, Object> pageScope(Screen screen) {
         File image = screen.getImage();
         String stem = FilenameUtils.getBaseName(image.getName());
         String ext = FilenameUtils.getExtension(image.getName());
@@ -158,7 +148,7 @@ public class EpubCompiler {
         return scope;
     }
 
-    private Map<String, Object> frameScope(Frame frame, Screen screen, Comic comic) {
+    private Map<String, Object> frameScope(Frame frame, Screen screen) {
         File image = screen.getImage();
         String stem = FilenameUtils.getBaseName(image.getName());
         String ext = FilenameUtils.getExtension(image.getName());
