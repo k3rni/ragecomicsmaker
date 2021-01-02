@@ -26,11 +26,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.*;
 
-public class ComicCompiler {
+public class EpubCompiler {
     private final File targetDir;
     private final Comic comic;
 
-    public ComicCompiler(File targetDir, Comic comic) {
+    public EpubCompiler(File targetDir, Comic comic) {
         this.targetDir = targetDir;
         this.comic = comic;
     }
