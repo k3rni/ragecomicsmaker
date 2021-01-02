@@ -75,7 +75,7 @@ public class SaveCommand {
 		return targetDir.toPath().resolve("clips").resolve(frameFilename);
 	}
 
-	static String frameFilename(Screen screen, Frame frame) {
+	public static String frameFilename(Screen screen, Frame frame) {
 		return String.format("%03d_%03d.png", screen.getIndex(), frame.getId());
 	}
 }

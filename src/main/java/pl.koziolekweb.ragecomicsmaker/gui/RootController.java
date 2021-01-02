@@ -21,13 +21,14 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
 import pl.koziolekweb.ragecomicsmaker.App;
-import pl.koziolekweb.ragecomicsmaker.EpubCompiler;
 import pl.koziolekweb.ragecomicsmaker.LoadCommand;
 import pl.koziolekweb.ragecomicsmaker.SaveCommand;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
 import pl.koziolekweb.ragecomicsmaker.model.Screen;
+import pl.koziolekweb.ragecomicsmaker.output.CBZCompiler;
+import pl.koziolekweb.ragecomicsmaker.output.EpubCompiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,8 @@ public class RootController {
     public TabPane tabPane;
     @FXML
     public Button browseBtn;
+    @FXML
+    public Button generateCBZ;
 
     @FXML
     MetadataController metadataTabController;
@@ -57,7 +60,7 @@ public class RootController {
     @FXML
     Button saveBtn;
     @FXML
-    Button generateBtn;
+    Button generateEPUB;
 
     Path targetDir;
     Comic comic = null;
@@ -75,7 +78,8 @@ public class RootController {
         // No easy way to set this from fxml
         saveBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.SAVE));
         browseBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.FOLDER_OPEN));
-        generateBtn.setGraphic(fontAwesome.create(FontAwesome.Glyph.BOOK));
+        generateEPUB.setGraphic(fontAwesome.create(FontAwesome.Glyph.BOOK));
+        generateCBZ.setGraphic(fontAwesome.create(FontAwesome.Glyph.FILE_ZIP_ALT));
         tabPane.getTabs().get(0).setGraphic(fontAwesome.create(FontAwesome.Glyph.EDIT));
         tabPane.getTabs().get(1).setGraphic(fontAwesome.create(FontAwesome.Glyph.TAGS));
         tabPane.getTabs().get(2).setGraphic(fontAwesome.create(FontAwesome.Glyph.HTML5));
@@ -111,7 +115,8 @@ public class RootController {
         templateTabController.onComicLoaded(targetDir);
         stylesheetTabController.onComicLoaded(targetDir);
         saveBtn.setDisable(false);
-        generateBtn.setDisable(false);
+        generateEPUB.setDisable(false);
+        generateCBZ.setDisable(false);
     }
 
     @FXML
@@ -125,10 +130,20 @@ public class RootController {
     }
 
     @FXML
-    void generateBook() {
+    void exportEPUB() {
         try {
             Path result = new EpubCompiler(targetDir.toFile(), comic).save();
-            infoPopup("Success", String.format("Comic saved as `%s`", result.getFileName()));
+            infoPopup("Success", String.format("Comic exported as `%s`", result.getFileName()));
+        } catch (IOException e) {
+            errorPopup(e);
+        }
+    }
+
+    @FXML
+    void exportCBZ() {
+        try {
+            Path result = new CBZCompiler(targetDir, comic).save();
+            infoPopup("Success", String.format("Comic exported as `%s`", result.getFileName()));
         } catch (IOException e) {
             errorPopup(e);
         }

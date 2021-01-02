@@ -1,4 +1,4 @@
-package pl.koziolekweb.ragecomicsmaker;
+package pl.koziolekweb.ragecomicsmaker.output;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -14,6 +14,7 @@ import coza.opencollab.epub.creator.util.EpubWriter;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import pl.koziolekweb.ragecomicsmaker.App;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.ComicMetadata;
@@ -188,10 +189,9 @@ public class EpubCompiler {
             String ext = FilenameUtils.getExtension(image.getName());
 
             if (comic.getInsertFullPages()) {
-                Content content = book.addContent(new FileInputStream(screen.getImage()),
+                book.addContent(new FileInputStream(screen.getImage()),
                         mime(ext), String.format("screens/%s.%s", stem, ext),
-                        false, false);
-                content.setId(stem);
+                        false, false).setId(stem);
             }
 
             for (Frame frame : screen.getFrames()) {
@@ -230,6 +230,7 @@ public class EpubCompiler {
             try {
                 book.addContent(stream, "text/css", "css/style.css", false, false);
             } catch (IOException e) {
+                App.EVENT_BUS.post(new ErrorEvent("Could not add stylesheet", e));
                 e.printStackTrace();
             }
         });
