@@ -8,7 +8,6 @@ plugins {
     // Uberjar packager
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-//    id 'org.beryx.runtime' version '1.11.4'
     id 'org.beryx.jlink' version '2.21.1'
 }
 
@@ -42,15 +41,11 @@ dependencies {
     implementation ('org.controlsfx:controlsfx:11.0.3') {
         exclude group: 'javafx'
     }
-
-    testImplementation 'org.testng:testng:6.8.8'
-    testImplementation 'org.easytesting:fest-assert-core:2.0M10'
-    testImplementation 'org.mockito:mockito-all:1.9.5'
 }
 
 mainClassName = 'pl.koziolekweb.ragecomicsmaker.App'
 group = 'pl.koziolekweb.ragecomicsmaker'
-version = '2.2.1'
+version = '2.5.0'
 description = 'ragecomicsmaker'
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
