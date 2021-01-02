@@ -14,6 +14,7 @@ import coza.opencollab.epub.creator.util.EpubWriter;
 import javafx.scene.image.Image;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
 import pl.koziolekweb.ragecomicsmaker.model.Comic;
 import pl.koziolekweb.ragecomicsmaker.model.ComicMetadata;
 import pl.koziolekweb.ragecomicsmaker.model.Frame;
@@ -23,8 +24,12 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 public class EpubCompiler {
     private final File targetDir;
@@ -42,8 +47,6 @@ public class EpubCompiler {
     public Path save() throws IOException {
         EpubBook book = new EpubBook();
 
-        setBasicMetadata(book);
-        Collection<MetadataItem> metadata = extraMetadata();
         addBookImages(book);
         addCover(book);
         addStylesheet(book);
@@ -72,12 +75,13 @@ public class EpubCompiler {
                         "text/html",
                         frame_ref,
                         false, true)
-                .setId(String.format("Page %d Frame %d", screen.getIndex() + 1, frame.getId()));
+                        .setId(String.format("Page %d Frame %d", screen.getIndex() + 1, frame.getId()));
             }
         }
 
         book.setLandmarks(List.of(firstPageLandmark()));
-
+        setBasicMetadata(book);
+        Collection<MetadataItem> metadata = extraMetadata();
         return saveToFile(book, metadata);
     }
 
@@ -90,10 +94,11 @@ public class EpubCompiler {
         writer.setTocCreator(this::createHiddenToc);
 
         Path out = targetDir.toPath().resolve(getTargetFilename());
-        try {
-            writer.writeEpubToStream(book, new FileOutputStream(out.toFile()));
+        try (OutputStream io = Files.newOutputStream(out, CREATE, TRUNCATE_EXISTING)) {
+            writer.writeEpubToStream(book, io);
             return out;
         } catch (Exception e) {
+            App.EVENT_BUS.post(new ErrorEvent("Failed to save EPUB", e));
             e.printStackTrace();
             return null;
         }
@@ -101,7 +106,8 @@ public class EpubCompiler {
 
     private Content createHiddenToc(EpubBook book) {
         Content toc = new TocCreatorDefault().createTocFromBook(book);
-        String old = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(toc.getContent())).toString();
+        ByteBuffer bytes = ByteBuffer.wrap(toc.getContent());
+        String old = StandardCharsets.UTF_8.decode(bytes).toString();
         String hidden = old.replace("<ol>", "<ol hidden=''>");
         toc.setContent(hidden.getBytes(StandardCharsets.UTF_8));
         return toc;
@@ -111,8 +117,8 @@ public class EpubCompiler {
         MustacheFactory mf = new DefaultMustacheFactory();
 
         try {
-            Path path = targetDir.toPath().resolve("templates/page.xhtml");
-            return mf.compile(new FileReader(path.toFile()), "templates/page.xhtml");
+            Path path = targetDir.toPath().resolve("page.xhtml");
+            return mf.compile(new FileReader(path.toFile()), "page.xhtml");
         } catch (FileNotFoundException fnf) {
             // No page template in comic directory. Use default one
             InputStream s = getClass().getResourceAsStream("/templates/page.xhtml");
