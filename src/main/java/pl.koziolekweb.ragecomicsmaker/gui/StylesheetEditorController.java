@@ -55,9 +55,9 @@ public class StylesheetEditorController {
     private List<Snippet> defaultSnippets() {
         return List.of(
                 new Snippet("Empty", ""),
-                loadSnippet("/translate50.css", "CSS translate()"),
-                loadSnippet("/flex-center.css", "Flexbox Center"),
-                loadSnippet("/table-centered.css", "CSS display:table")
+                loadSnippet("/templates/translate50.css", "CSS translate()"),
+                loadSnippet("/templates/flex-center.css", "Flexbox Center"),
+                loadSnippet("/templates/table-centered.css", "CSS display:table")
         );
     }
 

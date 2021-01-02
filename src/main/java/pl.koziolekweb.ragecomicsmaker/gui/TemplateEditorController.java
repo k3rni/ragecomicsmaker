@@ -55,11 +55,11 @@ public class TemplateEditorController {
 
     private List<Snippet> defaultSnippets() {
         return List.of(
-                loadSnippet("/page.xhtml", "Simple"),
-                loadSnippet("/svg-full-page.xhtml", "SVG Full Page"),
-                loadSnippet("/translate50.xhtml", "CSS translate() (use with stylesheet)"),
-                loadSnippet("/flex.xhtml", "Flexbox (use with stylesheet)"),
-                loadSnippet("/table-centered.xhtml", "CSS display:table (use with stylesheet)")
+                loadSnippet("/templates/page.xhtml", "Simple"),
+                loadSnippet("/templates/svg-full-page.xhtml", "SVG Full Page"),
+                loadSnippet("/templates/translate50.xhtml", "CSS translate() (use with stylesheet)"),
+                loadSnippet("/templates/flex.xhtml", "Flexbox (use with stylesheet)"),
+                loadSnippet("/templates/table-centered.xhtml", "CSS display:table (use with stylesheet)")
         );
     }
 
@@ -71,7 +71,7 @@ public class TemplateEditorController {
     public void onComicLoaded(Path targetDir) {
         this.targetDir = targetDir;
 
-        Path page = targetDir.resolve("page.xhtml");
+        Path page = targetDir.resolve("templates/page.xhtml");
         if (page.toFile().canRead()) {
             loadSource(page);
             saveBtn.setText("Overwrite");
@@ -83,7 +83,7 @@ public class TemplateEditorController {
 
         Optional.ofNullable(targetDir).ifPresent(path -> {
             try {
-                IOUtils.write(text, new FileOutputStream(path.resolve("page.xhtml").toFile()), Charset.defaultCharset());
+                IOUtils.write(text, new FileOutputStream(path.resolve("templates/page.xhtml").toFile()), Charset.defaultCharset());
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

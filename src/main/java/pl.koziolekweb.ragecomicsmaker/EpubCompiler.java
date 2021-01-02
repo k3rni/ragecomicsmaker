@@ -111,12 +111,12 @@ public class EpubCompiler {
         MustacheFactory mf = new DefaultMustacheFactory();
 
         try {
-            Path path = targetDir.toPath().resolve("page.xhtml");
-            return mf.compile(new FileReader(path.toFile()), "page.xhtml");
+            Path path = targetDir.toPath().resolve("templates/page.xhtml");
+            return mf.compile(new FileReader(path.toFile()), "templates/page.xhtml");
         } catch (FileNotFoundException fnf) {
             // No page template in comic directory. Use default one
-            InputStream s = getClass().getResourceAsStream("/page.xhtml");
-            return mf.compile(new InputStreamReader(s),"page.xhtml");
+            InputStream s = getClass().getResourceAsStream("/templates/page.xhtml");
+            return mf.compile(new InputStreamReader(s), "templates/page.xhtml");
         }
     }
 

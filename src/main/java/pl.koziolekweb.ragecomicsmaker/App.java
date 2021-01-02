@@ -17,7 +17,7 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Scene scene = new Scene(FXMLLoader.load(getClass().getResource("/ui.fxml")));
+		Scene scene = new Scene(FXMLLoader.load(getClass().getResource("/ui/ui.fxml")));
 		primaryStage.setTitle("RCM");
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(event -> System.exit(0));

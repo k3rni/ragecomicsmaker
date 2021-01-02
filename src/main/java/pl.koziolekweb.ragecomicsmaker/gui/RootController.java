@@ -21,7 +21,7 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.GlyphFont;
 import org.controlsfx.glyphfont.GlyphFontRegistry;
 import pl.koziolekweb.ragecomicsmaker.App;
-import pl.koziolekweb.ragecomicsmaker.ComicCompiler;
+import pl.koziolekweb.ragecomicsmaker.EpubCompiler;
 import pl.koziolekweb.ragecomicsmaker.LoadCommand;
 import pl.koziolekweb.ragecomicsmaker.SaveCommand;
 import pl.koziolekweb.ragecomicsmaker.event.ErrorEvent;
@@ -66,7 +66,7 @@ public class RootController {
     ObservableList<Screen> screens;
 
     private final GlyphFont fontAwesome = GlyphFontRegistry.font("FontAwesome");
-    private final String darkMode = getClass().getResource("/modena_dark.css").toExternalForm();
+    private final String darkMode = getClass().getResource("/themes/modena_dark.css").toExternalForm();
 
     @FXML
     void initialize() {
@@ -127,7 +127,7 @@ public class RootController {
     @FXML
     void generateBook() {
         try {
-            Path result = new ComicCompiler(targetDir.toFile(), comic).save();
+            Path result = new EpubCompiler(targetDir.toFile(), comic).save();
             infoPopup("Success", String.format("Comic saved as `%s`", result.getFileName()));
         } catch (IOException e) {
             errorPopup(e);

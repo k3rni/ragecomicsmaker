@@ -131,7 +131,7 @@ public class LeftPaneController {
         framesList.setItems(framesProperty.sorted());
     }
 
-    URL frameControlFXML = getClass().getResource("/frame-controls.fxml");
+    URL frameControlFXML = getClass().getResource("/ui/frame-controls.fxml");
     FXMLLoader loader = new FXMLLoader(frameControlFXML);
 
     private Node createFrameNode(Frame frame) {
