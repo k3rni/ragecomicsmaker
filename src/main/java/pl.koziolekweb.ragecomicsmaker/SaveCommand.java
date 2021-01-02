@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -66,17 +65,17 @@ public class SaveCommand {
 				Path path = clipPath(frameFilename);
 
 				BufferedImage crop = screen.crop(source, frame);
-				java.nio.file.Files.createDirectories(path.getParent());
+				Files.createDirectories(path.getParent());
 				ImageIO.write(crop, "png", path.toFile());
 			}
 		}
 	}
 
 	private Path clipPath(String frameFilename) {
-		return FileSystems.getDefault().getPath(targetDir.getAbsolutePath(), "clips", frameFilename);
+		return targetDir.toPath().resolve("clips").resolve(frameFilename);
 	}
 
-	private String frameFilename(Screen screen, Frame frame) {
+	static String frameFilename(Screen screen, Frame frame) {
 		return String.format("%03d_%03d.png", screen.getIndex(), frame.getId());
 	}
 }
